@@ -2,8 +2,8 @@ from telegram.ext import Updater, CommandHandler
 
 
 def start_bot(bot, update):
-    hello = update.message.chat.first_name
-    update.message.reply_text(f'Hello, {hello}')
+    hello_var = update.message.chat.first_name
+    update.message.reply_text(f'Hello, {hello_var}')
 
 
 def main(): 
