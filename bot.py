@@ -5,7 +5,7 @@ def start_bot(bot, update):
     user_name = update.message.chat.first_name
     bot_name = bot.first_name
     update.message.reply_text(f'''Hello {user_name}.
-My name is {bot_name}, i will to help you track of schedule,
+My name is {bot_name}, i will to help you track of study schedule,
 but now i know only command:  /start. 
 ''')
 
