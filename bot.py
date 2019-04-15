@@ -2,8 +2,12 @@ from telegram.ext import Updater, CommandHandler
 
 
 def start_bot(bot, update):
-    hello_var = update.message.chat.first_name
-    update.message.reply_text(f'Hello, {hello_var}')
+    user_name = update.message.chat.first_name
+    bot_name = bot.first_name
+    update.message.reply_text(f'''Hello {user_name}.
+My name is {bot_name}, i will to help you track of schedule,
+but now i know only command:  /start. 
+''')
 
 
 def main(): 
