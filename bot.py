@@ -1,4 +1,5 @@
 from telegram.ext import Updater, CommandHandler
+import settings
 
 
 def start_bot(bot, update):
@@ -11,7 +12,7 @@ but now i know only command:  /start.
 
 
 def main(): 
-    upd = Updater('TOKEN')
+    upd = Updater(settings.API_TOKEN)
     upd.dispatcher.add_handler(CommandHandler('start', start_bot))
     upd.start_polling()
     upd.idle()
