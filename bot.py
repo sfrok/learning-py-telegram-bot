@@ -19,25 +19,23 @@ right now I know only one command:  /start.
 ''', reply_markup=reply_markup)
 
 
-
-#Временный генератор списка предметов
+# Временный генератор списка предметов
 def get_list():
     lst = [
         "Физкультура",
         "Высшая физкультура",
         "Физкультурный анализ"
     ]
-    return lst
+    return sorted(lst)
 
-#Отображение списка WIP
+
+# Отображение списка WIP
 def display_list(bot, update):
     query = update.callback_query
     if query.data == "2":
-        tmp = get_list()
-        txt = ""
-        for i in tmp: 
-            txt += "\n" + i
-        bot.edit_message_text(text=("Here's the list of available subjects:{}".format(txt)), chat_id=query.message.chat_id, message_id=query.message.message_id)
+        tmp = '\n'.join(get_list())
+        bot.sendMessage(text=f"Here's the list of available subjects:\n{tmp}",
+                        chat_id=query.message.chat_id, message_id=query.message.message_id)
 
 
 def main():
