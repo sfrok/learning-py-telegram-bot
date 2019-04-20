@@ -9,7 +9,7 @@ logging.basicConfig(format='[%(asctime)s] [%(levelname)s] [%(name)s] %(message)s
                     stream=sys.stdout,
                     level=logging.INFO,
                     # filename='bot.log',
-                    filemode="w"
+                    # filemode="w"
                     )
 
 
@@ -18,18 +18,17 @@ def start_bot(bot, update):
     bot_name = bot.first_name
 
     main_menu = [
-        [InlineKeyboardButton(text='Main Button', callback_data='1')],
-        [InlineKeyboardButton(text='Show List', callback_data='2')],
-    ]
+        [InlineKeyboardButton(text='Show subjects', callback_data='1')],
+        ]
     reply_markup = InlineKeyboardMarkup(main_menu)
 
     update.message.reply_text(f'''Hello {user_name}.
-My name is {bot_name} and I will help you getting track of your study schedule,
-right now I know only one command:  /start.
-''', reply_markup=reply_markup)
+My name is {bot_name} and I will help you getting track of your study schedule, 
+right now I know only one command:  /start. ''', reply_markup=reply_markup)
 
 
-# Временный генератор списка предметов
+# WID: replace name subjects [RUS -> ENG]
+
 def get_list():
     lst = [
         "Физкультура",
@@ -41,12 +40,12 @@ def get_list():
 
 def callback(bot, update):
     query = update.callback_query
-    if query.data == "2":
+    if query.data == "1":
         tmp = '\n'.join(get_list())
-        logger.info('List create')
+        logger.info('List created')
         bot.sendMessage(text=f"Here's the list of available subjects:\n{tmp}",
                         chat_id=query.message.chat_id, message_id=query.message.message_id)
-        logger.info('Send message')
+        logger.info('Message send')
 
 
 def main():
@@ -58,6 +57,6 @@ def main():
 
 
 if __name__ == '__main__':
-    logger = logging.getLogger('PythonBot')
+    logger = logging.getLogger('PB')
     logger.info('Bot started')
     main()
