@@ -1,16 +1,7 @@
 from telegram.ext import Updater, CommandHandler, CallbackQueryHandler
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 import settings
-import logging
-import sys
-
-
-logging.basicConfig(format='[%(asctime)s] [%(levelname)s] [%(name)s] %(message)s',
-                    stream=sys.stdout,
-                    level=logging.INFO,
-                    # filename='bot.log',
-                    # filemode="w"
-                    )
+import logs
 
 
 def start_bot(bot, update):
@@ -57,6 +48,6 @@ def main():
 
 
 if __name__ == '__main__':
-    logger = logging.getLogger('PB')
+    logger = logs.main_logger
     logger.info('Bot started')
     main()
