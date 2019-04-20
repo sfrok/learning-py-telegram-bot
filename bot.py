@@ -9,34 +9,45 @@ def start_bot(bot, update):
     bot_name = bot.first_name
 
     main_menu = [
-        [InlineKeyboardButton(text='Show subjects', callback_data='1')],
+        [InlineKeyboardButton(text='Show subjects', callback_data='subjects')],
         ]
-    reply_markup = InlineKeyboardMarkup(main_menu)
+    reply_main_menu = InlineKeyboardMarkup(main_menu)
 
     update.message.reply_text(f'''Hello {user_name}.
 My name is {bot_name} and I will help you getting track of your study schedule, 
-right now I know only one command:  /start. ''', reply_markup=reply_markup)
+right now I know only one command:  /start. ''', reply_markup=reply_main_menu)
 
 
-# WID: replace name subjects [RUS -> ENG]
+# WIP: replace name subjects [RUS -> ENG]
 
 def get_list():
     lst = [
-        "Физкультура",
-        "Высшая физкультура",
-        "Физкультурный анализ"
+        'Физкультура',
+        'Высшая физкультура',
+        'Физкультурный анализ'
     ]
     return sorted(lst)
 
 
 def callback(bot, update):
+
+    back_to_main_menu = [
+        [InlineKeyboardButton(text='Back', callback_data='back_to_main_menu')],
+    ]
+    reply_back_to_main_menu = InlineKeyboardMarkup(back_to_main_menu)
+
     query = update.callback_query
-    if query.data == "1":
+
+    if query.data == 'subjects':
         tmp = '\n'.join(get_list())
-        logger.info('List created')
+        logger.info('Subjects list created')
         bot.sendMessage(text=f"Here's the list of available subjects:\n{tmp}",
-                        chat_id=query.message.chat_id, message_id=query.message.message_id)
-        logger.info('Message send')
+                        chat_id=query.message.chat_id, message_id=query.message.message_id,
+                        reply_markup=reply_back_to_main_menu)
+        logger.info('Stage: main menu')
+
+    if query.data == 'back_to_main_menu':
+        logger.info('Stage: Back to main menu')  # WIP -> back to main menu
 
 
 def main():
