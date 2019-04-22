@@ -1,8 +1,7 @@
 #!/usr/bin/env python3
 from telegram.ext import Updater, CommandHandler, CallbackQueryHandler
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
-import settings
-import logs
+import settings, logs, json
 
 
 def main_menu(user_name, bot_name):
@@ -20,10 +19,10 @@ def start_bot(bot, update):
     msg = main_menu(update.message.chat.first_name, bot.first_name)
     update.message.reply_text(msg[0], reply_markup=msg[1])
 
-# WIP: replace name subjects [RUS -> ENG]
 
-
-def get_list():
+    # Reading and saving JSON data
+def get_list(id):
+    id = str(id)
     lst = [
         '1.Physical Education',
         '2.Computer architecture',
@@ -33,7 +32,23 @@ def get_list():
         '6.Mechanical drawing',
         '7.Computer circuitry'
     ]
-    return sorted(lst)
+    default = {'items': lst, 'sched': []} # Setting a default library
+
+    logger.info('= = = = = Requesting user info... = = = = =')
+    
+    with open("db.json", "r", encoding='utf-8') as read_file: # Reading dictionary from database (JSON file)
+        user_info = json.load(read_file)
+
+    logger.info(f'Input user id: {id}')
+    logger.info(f'Result (if not found or empty you will see default settings):\n{user_info.get(id, 0)}')
+
+    if user_info.get(id, default) == default: # Looking for our user's ID in the dictionary
+        user_info.update({id:default}) # If ID is not found, then creating a new entry
+        with open("db.json", "w", encoding='utf-8') as write_file: # Rewriting new data in case of new entry
+            json.dump(user_info, write_file, ensure_ascii=False)
+
+    logger.info('= = = = = Request completed = = = = =')
+    return sorted(user_info[id]["items"])
 
 
 def callback(bot, update):
@@ -56,7 +71,7 @@ def callback(bot, update):
     query = update.callback_query
 
     if query.data == 'subjects':
-        tmp = '\n'.join(get_list())
+        tmp = '\n'.join(get_list(query.message.chat_id))
         logger.info('Subjects list created')
         bot.sendMessage(text=f"Here's the list of available subjects:\n{tmp}",
                         chat_id=query.message.chat_id,
