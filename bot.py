@@ -44,13 +44,9 @@ def get_data(id):
     logger.info(f'Input user id: {id}')
     logger.info(f'Result (if not found or empty you will see default settings):\n{user_info.get(id, default)}')
 
-    if user_info.get(id, default) == default: # Looking for our user's ID in the dictionary
-        user_info.update({id: default}) # If ID is not found, then creating a new entry
-
-    if user_info.get(id, 0) == 0:  # Looking for our user's ID in the dictionary
+    if user_info.get(id, default) == default:  # Looking for our user's ID in the dictionary
         user_info.update({id: default})  # If ID is not found, then creating a new entry
-
-        with open("db.json", "w", encoding='utf-8') as write_file: # Rewriting new data in case of new entry
+        with open("db.json", "w", encoding='utf-8') as write_file:  # Rewriting new data in case of new entry
             json.dump(user_info, write_file, ensure_ascii=False)
         logger.info('Created new entry')
 
