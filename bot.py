@@ -12,9 +12,9 @@ def main_menu(user_name, bot_name):
         [InlineKeyboardButton(text='View schedule', callback_data='schedule')]
         ]
     reply_main_menu = InlineKeyboardMarkup(main_menu_markup)
-    return [f'''Hello {user_name}.
-    My name is {bot_name} and I will help you getting track of your study schedule, 
-    right now I know only one command:  /start. ''', reply_main_menu]
+    return [f'''Hello {user_name}!
+My name is {bot_name} and I will help you getting track of your study schedule. 
+''', reply_main_menu]
 
 
 def start_bot(bot, update):

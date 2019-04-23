@@ -1,36 +1,4 @@
 {
-<<<<<<< HEAD
-  "339623594": {
-    "items": [
-      "Sosok",
-      "Nosok",
-      "Kusok"
-    ],
-    "sched": []
-  },
-  "339623595": {
-    "items": [
-      "Sosok",
-      "Nosok",
-      "Kusok"
-    ],
-    "sched": [
-      "dfdfd"
-    ]
-  },
-  "248664749": {
-    "items": [
-      "Physical Education",
-      "Computer architecture",
-      "System Programming",
-      "Computer networks",
-      "Peripherals",
-      "Mechanical drawing",
-      "Computer circuitry"
-    ],
-    "sched": []
-  }
-=======
     "339623595": {
         "items": [
             "Sosok",
@@ -61,5 +29,4 @@
             []
         ]
     }
->>>>>>> 164c7e5d6c969ab76752a4beeb1788ba483cd418
 }
