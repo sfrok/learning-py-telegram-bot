@@ -1,20 +1,32 @@
 {
-    "339623594": {
-        "items": [
-            "Sosok",
-            "Nosok",
-            "Kusok"
-        ],
-        "sched": []
-    },
-    "339623595": {
-        "items": [
-            "Sosok",
-            "Nosok",
-            "Kusok"
-        ],
-        "sched": [
-            "dfdfd"
-        ]
-    }
+  "339623594": {
+    "items": [
+      "Sosok",
+      "Nosok",
+      "Kusok"
+    ],
+    "sched": []
+  },
+  "339623595": {
+    "items": [
+      "Sosok",
+      "Nosok",
+      "Kusok"
+    ],
+    "sched": [
+      "dfdfd"
+    ]
+  },
+  "248664749": {
+    "items": [
+      "Physical Education",
+      "Computer architecture",
+      "System Programming",
+      "Computer networks",
+      "Peripherals",
+      "Mechanical drawing",
+      "Computer circuitry"
+    ],
+    "sched": []
+  }
 }
