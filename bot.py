@@ -24,13 +24,13 @@ def start_bot(bot, update):
 def get_list(id):
     id = str(id)
     lst = [
-        '1.Physical Education',
-        '2.Computer architecture',
-        '3.System Programming',
-        '4.Computer networks',
-        '5.Peripherals',
-        '6.Mechanical drawing',
-        '7.Computer circuitry'
+        'Physical Education',
+        'Computer architecture',
+        'System Programming',
+        'Computer networks',
+        'Peripherals',
+        'Mechanical drawing',
+        'Computer circuitry'
     ]
     default = {'items': lst, 'sched': []} # Setting a default library
 
@@ -43,7 +43,7 @@ def get_list(id):
     logger.info(f'Result (if not found or empty you will see default settings):\n{user_info.get(id, 0)}')
 
     if user_info.get(id, default) == default: # Looking for our user's ID in the dictionary
-        user_info.update({id:default}) # If ID is not found, then creating a new entry
+        user_info.update({id: default}) # If ID is not found, then creating a new entry
         with open("db.json", "w", encoding='utf-8') as write_file: # Rewriting new data in case of new entry
             json.dump(user_info, write_file, ensure_ascii=False)
 
