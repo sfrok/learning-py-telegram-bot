@@ -21,18 +21,18 @@ def start_bot(bot, update):
 
 
     # Reading and saving JSON data
-def get_list(id):
+def get_data(id):
     id = str(id)
     lst = [
-        '1.Physical Education',
-        '2.Computer architecture',
-        '3.System Programming',
-        '4.Computer networks',
-        '5.Peripherals',
-        '6.Mechanical drawing',
-        '7.Computer circuitry'
+        'Physical Education',
+        'Computer architecture',
+        'System Programming',
+        'Computer networks',
+        'Peripherals',
+        'Mechanical drawing',
+        'Computer circuitry'
     ]
-    default = {'items': lst, 'sched': []} # Setting a default library
+    default = {'items': lst, 'sched': [[],[],[],[],[],[],[]]} # Setting a default library
 
     logger.info('= = = = = Requesting user info... = = = = =')
     
@@ -40,15 +40,16 @@ def get_list(id):
         user_info = json.load(read_file)
 
     logger.info(f'Input user id: {id}')
-    logger.info(f'Result (if not found or empty you will see default settings):\n{user_info.get(id, 0)}')
+    logger.info(f'Result (if not found or empty you will see default settings):\n{user_info.get(id, default)}')
 
-    if user_info.get(id, default) == default: # Looking for our user's ID in the dictionary
+    if user_info.get(id, 0) == 0: # Looking for our user's ID in the dictionary
         user_info.update({id:default}) # If ID is not found, then creating a new entry
         with open("db.json", "w", encoding='utf-8') as write_file: # Rewriting new data in case of new entry
             json.dump(user_info, write_file, ensure_ascii=False)
+        logger.info('Created new entry')
 
     logger.info('= = = = = Request completed = = = = =')
-    return sorted(user_info[id]["items"])
+    return user_info[id]
 
 
 def callback(bot, update):
@@ -57,21 +58,10 @@ def callback(bot, update):
     ]
     reply_back_to_main_menu = InlineKeyboardMarkup(back_to_main_menu)
 
-    view_schedule = [
-        [InlineKeyboardButton(text='Monday', callback_data='Monday')],
-        [InlineKeyboardButton(text='Tuesday', callback_data='Tuesday')],
-        [InlineKeyboardButton(text='Wednesday', callback_data='Wednesday')],
-        [InlineKeyboardButton(text='Thursday', callback_data='Thursday')],
-        [InlineKeyboardButton(text='Friday', callback_data='Friday')],
-        [InlineKeyboardButton(text='Saturday', callback_data='Saturday')],
-        [InlineKeyboardButton(text='Sunday', callback_data='Sunday')]
-    ]
-    reply_view_schedule = InlineKeyboardMarkup(view_schedule)
-
     query = update.callback_query
 
     if query.data == 'subjects':
-        tmp = '\n'.join(get_list(query.message.chat_id))
+        tmp = '\n'.join(sorted(get_data(query.message.chat_id)["items"]))
         logger.info('Subjects list created')
         bot.sendMessage(text=f"Here's the list of available subjects:\n{tmp}",
                         chat_id=query.message.chat_id,
@@ -79,11 +69,23 @@ def callback(bot, update):
         logger.info('Stage: main menu')
 
     elif query.data == 'schedule':
+        user_sched = get_data(query.message.chat_id)["sched"] # Requesting schedule data
+        
+        view_schedule = [
+            [InlineKeyboardButton(text='Monday', callback_data='Monday')],
+            [InlineKeyboardButton(text='Tuesday', callback_data='Tuesday')],
+            [InlineKeyboardButton(text='Wednesday', callback_data='Wednesday')],
+            [InlineKeyboardButton(text='Thursday', callback_data='Thursday')],
+            [InlineKeyboardButton(text='Friday', callback_data='Friday')],
+            [InlineKeyboardButton(text='Saturday', callback_data='Saturday')],
+            [InlineKeyboardButton(text='Sunday', callback_data='Sunday')]
+        ]
+        reply_view_schedule = InlineKeyboardMarkup(view_schedule)
         bot.sendMessage(text="Select the day in which you want to view the schedule",
                         chat_id=query.message.chat_id, message_id=query.message.message_id,
                         reply_markup=reply_view_schedule)
 
-    if query.data == 'back_to_main_menu':
+    elif query.data == 'back_to_main_menu':
         logger.info('Stage: Back to main menu')
         msg = main_menu(query.message.chat.first_name, bot.first_name)
         bot.sendMessage(text=msg[0], chat_id=query.message.chat_id, reply_markup=msg[1])
