@@ -80,12 +80,12 @@ def callback(bot, update):
             [InlineKeyboardButton(text='Thursday', callback_data='Thursday')],
             [InlineKeyboardButton(text='Friday', callback_data='Friday')],
             [InlineKeyboardButton(text='Saturday', callback_data='Saturday')],
-            [InlineKeyboardButton(text='Sunday', callback_data='Sunday')]
+            [InlineKeyboardButton(text='Sunday', callback_data='Sunday')],
+            [InlineKeyboardButton(text='Back', callback_data='back_to_main_menu')]
         ]
         reply_view_schedule = InlineKeyboardMarkup(view_schedule)
         bot.sendMessage(text="Select the day in which you want to view the schedule",
-                        chat_id=query.message.chat_id, message_id=query.message.message_id,
-                        reply_markup=reply_view_schedule)
+                        chat_id=query.message.chat_id, reply_markup=reply_view_schedule)
 
     elif query.data == 'back_to_main_menu':
         logger.info('Stage: Back to main menu')
