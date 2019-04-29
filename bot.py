@@ -6,20 +6,19 @@ import logs
 import json
 
 
-def main_menu(user_name, bot_name):
+def start_bot(bot, update):
+    user_name = update.message.chat.first_name
+    bot_name = bot.first_name
+
     main_menu_markup = [
         [InlineKeyboardButton(text='Show subjects', callback_data='subjects')],
         [InlineKeyboardButton(text='View schedule', callback_data='schedule')]
-        ]
+    ]
+
     reply_main_menu = InlineKeyboardMarkup(main_menu_markup)
-    return [f'''Hello {user_name}!
+    update.message.reply_text(f'''Hello {user_name}!
 My name is {bot_name} and I will help you getting track of your study schedule. 
-''', reply_main_menu]
-
-
-def start_bot(bot, update):
-    msg = main_menu(update.message.chat.first_name, bot.first_name)
-    update.message.reply_text(msg[0], reply_markup=msg[1])
+''', reply_markup=reply_main_menu)
 
 
 # Reading and saving JSON data
@@ -65,9 +64,11 @@ def callback(bot, update):
     if query.data == 'subjects':
         tmp = '\n'.join(sorted(get_data(query.message.chat_id)["items"]))
         logger.info('Subjects list created')
-        bot.sendMessage(text=f"Here's the list of available subjects:\n{tmp}",
-                        chat_id=query.message.chat_id,
-                        reply_markup=reply_back_to_main_menu)
+        bot.editMessageText(text=f"Here's the list of available subjects:\n{tmp}",
+                            chat_id=query.message.chat_id,
+                            reply_markup=reply_back_to_main_menu,
+                            message_id=query.message.message_id
+                            )
         logger.info('Stage: main menu')
 
     elif query.data == 'schedule':
@@ -84,13 +85,14 @@ def callback(bot, update):
             [InlineKeyboardButton(text='Back', callback_data='back_to_main_menu')]
         ]
         reply_view_schedule = InlineKeyboardMarkup(view_schedule)
-        bot.sendMessage(text="Select the day in which you want to view the schedule",
-                        chat_id=query.message.chat_id, reply_markup=reply_view_schedule)
-
+        bot.editMessageText(text="Select the day in which you want to view the schedule",
+                            chat_id=query.message.chat_id,
+                            reply_markup=reply_view_schedule,
+                            message_id=query.message.message_id
+                            )
     elif query.data == 'back_to_main_menu':
         logger.info('Stage: Back to main menu')
-        msg = main_menu(query.message.chat.first_name, bot.first_name)
-        bot.sendMessage(text=msg[0], chat_id=query.message.chat_id, reply_markup=msg[1])
+        start_bot(bot, query)
 
 
 def main():
