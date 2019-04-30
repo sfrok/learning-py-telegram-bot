@@ -33,7 +33,16 @@ def get_data(id):
         'Mechanical drawing',
         'Computer circuitry'
     ]
-    default = {'items': lst, 'sched': [[], [], [], [], [], [], []]}  # Setting a default library
+    sch = {
+        'Monday': [],
+        'Tuesday': [],
+        'Wednesday': [],
+        'Thursday': [],
+        'Friday': [],
+        'Saturday': [],
+        'Sunday': []
+    }
+    default = {'items': lst, 'sched': sch}  # Setting a default library
 
     logger.info('= = = = = Requesting user info... = = = = =')
     
@@ -54,45 +63,63 @@ def get_data(id):
 
 
 def callback(bot, update):
+
     back_to_main_menu = [
         [InlineKeyboardButton(text='Back', callback_data='back_to_main_menu')],
     ]
-    reply_back_to_main_menu = InlineKeyboardMarkup(back_to_main_menu)
+    reply = InlineKeyboardMarkup(back_to_main_menu)
 
     query = update.callback_query
+    c_i = query.message.chat_id
+    m_i = query.message.message_id
 
     if query.data == 'subjects':
-        tmp = '\n'.join(sorted(get_data(query.message.chat_id)["items"]))
+        tmp = '\n'.join(sorted(get_data(query.message.chat_id)['items']))
         logger.info('Subjects list created')
         bot.editMessageText(text=f"Here's the list of available subjects:\n{tmp}",
-                            chat_id=query.message.chat_id,
-                            reply_markup=reply_back_to_main_menu,
-                            message_id=query.message.message_id
-                            )
+                            chat_id=c_i, reply_markup=reply, message_id=m_i)
         logger.info('Stage: main menu')
-
-    elif query.data == 'schedule':
-        user_sched = get_data(query.message.chat_id)["sched"]  # Requesting schedule data
-        
-        view_schedule = [
-            [InlineKeyboardButton(text='Monday', callback_data='Monday')],
-            [InlineKeyboardButton(text='Tuesday', callback_data='Tuesday')],
-            [InlineKeyboardButton(text='Wednesday', callback_data='Wednesday')],
-            [InlineKeyboardButton(text='Thursday', callback_data='Thursday')],
-            [InlineKeyboardButton(text='Friday', callback_data='Friday')],
-            [InlineKeyboardButton(text='Saturday', callback_data='Saturday')],
-            [InlineKeyboardButton(text='Sunday', callback_data='Sunday')],
-            [InlineKeyboardButton(text='Back', callback_data='back_to_main_menu')]
-        ]
-        reply_view_schedule = InlineKeyboardMarkup(view_schedule)
-        bot.editMessageText(text="Select the day in which you want to view the schedule",
-                            chat_id=query.message.chat_id,
-                            reply_markup=reply_view_schedule,
-                            message_id=query.message.message_id
-                            )
     elif query.data == 'back_to_main_menu':
         logger.info('Stage: Back to main menu')
-        start_bot(bot, query)
+        user_name = query.message.chat.first_name
+        bot_name = bot.first_name
+        main_menu_markup = [
+            [InlineKeyboardButton(text='Show subjects', callback_data='subjects')],
+            [InlineKeyboardButton(text='View schedule', callback_data='schedule')]
+        ]
+        reply = InlineKeyboardMarkup(main_menu_markup)
+        bot.editMessageText(text=f'''Hello {user_name}!
+My name is {bot_name} and I will help you getting track of your study schedule.''',
+                            chat_id=c_i, reply_markup=reply, message_id=m_i)
+
+    else:
+        user_sched = get_data(query.message.chat_id)['sched']  # Requesting schedule data
+        days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
+
+        if query.data == 'schedule':
+            view_schedule = []
+            for i in days:
+                view_schedule.append([InlineKeyboardButton(text=i, callback_data=i)])
+            view_schedule.append([InlineKeyboardButton(text='Back', callback_data='back_to_main_menu')])
+            reply = InlineKeyboardMarkup(view_schedule)
+            bot.editMessageText(text='Select the day in which you want to view the schedule',
+                                chat_id=c_i, reply_markup=reply, message_id=m_i)
+        else:
+            for i in days:
+                if query.data == i:
+                    if user_sched[i] == list([]):
+                        tmp = 'Sorry you fool!'
+                    else:
+                        tmp = '\n'.join(user_sched[i])
+                    view_schedule = [
+                        [InlineKeyboardButton(text='Back', callback_data='back_to_main_menu')]
+
+
+                        # edit, add, delete
+                    ]
+                    reply = InlineKeyboardMarkup(view_schedule)
+                    bot.editMessageText(text=tmp,
+                                        chat_id=c_i, reply_markup=reply, message_id=m_i)
 
 
 def main():
