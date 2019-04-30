@@ -5,6 +5,7 @@ import settings
 import logs
 import json
 
+logger = None
 
 def start_bot(bot, update):
     user_name = update.message.chat.first_name
@@ -62,7 +63,20 @@ def get_data(id):
     return user_info[id]
 
 
-def callback(bot, update):
+# Updating JSON data
+def set_data(id, data):
+    id = str(id)
+    logger.info('= = = = = Saving user info... = = = = =')
+    logger.info(f'Input user id: {id}')
+    with open("db.json", "r", encoding='utf-8') as read_file:  # Reading dictionary from database (JSON file)
+        user_info = json.load(read_file)
+    user_info.update({id: data})
+    with open("db.json", "w", encoding='utf-8') as write_file:
+        json.dump(user_info, write_file, ensure_ascii=False)
+    logger.info('= = = = = Save completed = = = = =')
+
+
+def callback(bot, update, user_data):
 
     back_to_main_menu = [
         [InlineKeyboardButton(text='Back', callback_data='back_to_main_menu')],
@@ -74,7 +88,8 @@ def callback(bot, update):
     m_i = query.message.message_id
 
     if query.data == 'subjects':
-        tmp = '\n'.join(sorted(get_data(query.message.chat_id)['items']))
+        user_data['data'] = get_data(query.message.chat_id)  # Requesting schedule data
+        tmp = '\n'.join(sorted(user_data['data']['items']))
         logger.info('Subjects list created')
         bot.editMessageText(text=f"Here's the list of available subjects:\n{tmp}",
                             chat_id=c_i, reply_markup=reply, message_id=m_i)
@@ -92,11 +107,57 @@ def callback(bot, update):
 My name is {bot_name} and I will help you getting track of your study schedule.''',
                             chat_id=c_i, reply_markup=reply, message_id=m_i)
 
+
+    # ------------ Button 'DELETE' in schedule ------------ # START
+    elif query.data == 'sched_del_start':
+        day = user_data['day']
+        user_sched = user_data['data']['sched'][day]
+        logger.info('= = = = = DELETING: Deleting an item in schedule... = = = = =')
+        logger.info(f'Callback: {query.data}\nDay index: {day}\nSchedule for this day:{user_sched}')
+        markup = []
+        user_list = user_data['data']['items']
+        n = 1
+        for j in user_sched:
+            if int(j) > int(-1) and int(j) < len(user_list):
+                tmp = str(n) + '. ' + user_list[j]
+                markup.append([InlineKeyboardButton(text=tmp, callback_data='sched_del_item_'+str(n-1))])
+            n += 1
+        markup.append([InlineKeyboardButton(text='Delete all', callback_data='sched_del_all')])
+        markup.append([InlineKeyboardButton(text='Cancel', callback_data=day)])
+        reply = InlineKeyboardMarkup(markup)
+        logger.info('= = = = = DELETING: Created a message, waiting for callback = = = = =')
+        bot.editMessageText(text='Select what you want to delete:',
+                            chat_id=c_i, reply_markup=reply, message_id=m_i)
+
+    elif query.data[:15] == 'sched_del_item_':
+        item_id = int(query.data[15:])
+        day = user_data['day']
+        logger.info(f'Deleting item #{item_id} in the schedule for this day: {day}')
+        user_data['data']['sched'][day][item_id] = -1
+        set_data(query.message.chat_id, user_data['data'])
+        logger.info('= = = = = DELETING: Finished = = = = =')
+        update.callback_query.data = day
+        callback(bot, update, user_data)
+
+    elif query.data == 'sched_del_all':
+        day = user_data['day']
+        logger.info(f'Deleting all items in the schedule for this day: {day}')
+        user_data['data']['sched'][day] = []
+        set_data(query.message.chat_id, user_data['data'])
+        logger.info('= = = = = DELETING: Finished = = = = =')
+        update.callback_query.data = day
+        callback(bot, update, user_data)
+    # ------------ Button 'DELETE' in schedule ------------ # END
+
+
+
     else:
-        user_sched = get_data(query.message.chat_id)['sched']  # Requesting schedule data
+        user_data['data'] = get_data(query.message.chat_id)  # Requesting schedule data
+        user_sched = user_data['data']['sched']
         days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
 
         if query.data == 'schedule':
+            logger.info('Stage: Showing week days')
             view_schedule = []
             for i in days:
                 view_schedule.append([InlineKeyboardButton(text=i, callback_data=i)])
@@ -107,22 +168,41 @@ My name is {bot_name} and I will help you getting track of your study schedule.'
         else:
             for i in days:
                 if query.data == i:
+                    logger.info(f'Stage: Showing schedule for this day: {i}')
+                    logger.info(f'------ List of items: {user_sched[i]}')
+                    view_schedule = [
+
+                        # add
+
+                    ]
+
+                    # Cleaning up schedule in case it only consists of incorrect ids
                     tmp = 'No lessons yet!'
+                    user_list = user_data['data']['items']
+                    logger.info(f'------ Length of list of subjects: {len(user_list)}')
                     if user_sched[i] != list([]):
-                        user_list = get_data(query.message.chat_id)['items']
+                        empty = True
+                        for j in user_sched[i]:
+                            if int(j) > int(-1) and int(j) < len(user_list):
+                                empty = False
+                        if empty:
+                            user_data['data']['sched'][i] = []
+                            set_data(query.message.chat_id, user_data['data'])
+
+                    if user_sched[i] != list([]):
                         n = 1
                         tmp = f'Schedule for {i}:'
                         for j in user_sched[i]:
                             if int(j) > int(-1) and int(j) < len(user_list):
                                 tmp = tmp + ('\n' + str(n) + '. ' + user_list[j])
                             n += 1
+                        user_data['day'] = i
 
-                    view_schedule = [
-                        [InlineKeyboardButton(text='Back', callback_data='back_to_main_menu')]
+                        # edit, delete
+                        
+                        view_schedule.append([InlineKeyboardButton(text='Delete', callback_data='sched_del_start')])
 
-
-                        # edit, add, delete
-                    ]
+                    view_schedule.append([InlineKeyboardButton(text='Back', callback_data='back_to_main_menu')])
                     reply = InlineKeyboardMarkup(view_schedule)
                     bot.editMessageText(text=tmp,
                                         chat_id=c_i, reply_markup=reply, message_id=m_i)
@@ -131,7 +211,7 @@ My name is {bot_name} and I will help you getting track of your study schedule.'
 def main():
     upd = Updater(settings.API_TOKEN)
     upd.dispatcher.add_handler(CommandHandler('start', start_bot))
-    upd.dispatcher.add_handler(CallbackQueryHandler(callback))
+    upd.dispatcher.add_handler(CallbackQueryHandler(callback, pass_user_data=True))
     upd.start_polling()
     upd.idle()
 
