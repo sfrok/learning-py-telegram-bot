@@ -107,10 +107,16 @@ My name is {bot_name} and I will help you getting track of your study schedule.'
         else:
             for i in days:
                 if query.data == i:
-                    if user_sched[i] == list([]):
-                        tmp = 'Sorry you fool!'
-                    else:
-                        tmp = '\n'.join(user_sched[i])
+                    tmp = 'No lessons yet!'
+                    if user_sched[i] != list([]):
+                        user_list = get_data(query.message.chat_id)['items']
+                        n = 1
+                        tmp = f'Schedule for {i}:'
+                        for j in user_sched[i]:
+                            if int(j) > int(-1) and int(j) < len(user_list):
+                                tmp = tmp + ('\n' + str(n) + '. ' + user_list[j])
+                            n += 1
+
                     view_schedule = [
                         [InlineKeyboardButton(text='Back', callback_data='back_to_main_menu')]
 
