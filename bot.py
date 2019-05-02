@@ -7,6 +7,7 @@ import json
 
 logger = None
 
+
 def start_bot(bot, update):
     user_name = update.message.chat.first_name
     bot_name = bot.first_name
@@ -118,7 +119,7 @@ My name is {bot_name} and I will help you getting track of your study schedule.'
         user_list = user_data['data']['items']
         n = 1
         for j in user_sched:
-            if int(j) > int(-1) and int(j) < len(user_list):
+            if -1 < int(j) < len(user_list):
                 tmp = str(n) + '. ' + user_list[j]
                 markup.append([InlineKeyboardButton(text=tmp, callback_data='sched_del_item_'+str(n-1))])
             n += 1
@@ -134,6 +135,12 @@ My name is {bot_name} and I will help you getting track of your study schedule.'
         day = user_data['day']
         logger.info(f'Deleting item #{item_id} in the schedule for this day: {day}')
         user_data['data']['sched'][day][item_id] = -1
+        empty = True
+        for j in user_data['data']['sched'][day]:
+            if -1 < int(j) < len(user_data['data']['items']):
+                empty = False
+        if empty:
+            user_data['data']['sched'][day] = []
         set_data(query.message.chat_id, user_data['data'])
         logger.info('= = = = = DELETING: Finished = = = = =')
         update.callback_query.data = day
@@ -149,8 +156,9 @@ My name is {bot_name} and I will help you getting track of your study schedule.'
         callback(bot, update, user_data)
     # ------------ Button 'DELETE' in schedule ------------ # END
 
+    # ------------ Button 'ADD' in schedule ------------ # START
 
-
+    # ------------ Button 'DELETE' in schedule ------------ # END
     else:
         user_data['data'] = get_data(query.message.chat_id)  # Requesting schedule data
         user_sched = user_data['data']['sched']
@@ -170,33 +178,21 @@ My name is {bot_name} and I will help you getting track of your study schedule.'
                 if query.data == i:
                     logger.info(f'Stage: Showing schedule for this day: {i}')
                     logger.info(f'------ List of items: {user_sched[i]}')
+                    user_data['day'] = i
                     view_schedule = [
-
-                        # add
-
+                        [InlineKeyboardButton(text='Add', callback_data='add')]
                     ]
-
                     # Cleaning up schedule in case it only consists of incorrect ids
                     tmp = 'No lessons yet!'
                     user_list = user_data['data']['items']
                     logger.info(f'------ Length of list of subjects: {len(user_list)}')
                     if user_sched[i] != list([]):
-                        empty = True
-                        for j in user_sched[i]:
-                            if int(j) > int(-1) and int(j) < len(user_list):
-                                empty = False
-                        if empty:
-                            user_data['data']['sched'][i] = []
-                            set_data(query.message.chat_id, user_data['data'])
-
-                    if user_sched[i] != list([]):
                         n = 1
                         tmp = f'Schedule for {i}:'
                         for j in user_sched[i]:
-                            if int(j) > int(-1) and int(j) < len(user_list):
+                            if -1 < int(j) < len(user_list):
                                 tmp = tmp + ('\n' + str(n) + '. ' + user_list[j])
                             n += 1
-                        user_data['day'] = i
 
                         # edit, delete
                         
