@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-from telegram.ext import Updater, CommandHandler, CallbackQueryHandler
+from telegram.ext import Updater, CommandHandler, CallbackQueryHandler, ConversationHandler, RegexHandler
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 import settings
 import logs
@@ -75,6 +75,23 @@ def set_data(id, data):
     with open("db.json", "w", encoding='utf-8') as write_file:
         json.dump(user_info, write_file, ensure_ascii=False)
     logger.info('= = = = = Save completed = = = = =')
+
+
+def regex_handler(bot, update, groups, user_data):
+    logger.info(f'Stage: Received regex statement. Regex groups: {groups}')
+    bot.deleteMessage(chat_id=update.message.chat_id, message_id=update.message.message_id)
+    bot.deleteMessage(chat_id=update.message.chat_id, message_id=user_data['m_i'])
+    user_data.pop('m_i')
+    user_data['regex'] = groups[0]
+    markup = []
+    n = 0
+    for i in user_data['data']['items']:
+        markup.append([InlineKeyboardButton(text=i, callback_data='sched_add_item_' + str(n))])
+        n += 1
+    bot.sendMessage(text=f'You entered {groups[0]}, now select a subject:',
+                    reply_markup=InlineKeyboardMarkup(markup), chat_id=update.message.chat_id)
+    logger.info(f'Stage: End of regex conversation. Value to pass: {groups[0]}, callback_data: sched_add_item_{i}')
+    return ConversationHandler.END
 
 
 def callback(bot, update, user_data):
@@ -157,8 +174,30 @@ My name is {bot_name} and I will help you getting track of your study schedule.'
     # ------------ Button 'DELETE' in schedule ------------ # END
 
     # ------------ Button 'ADD' in schedule ------------ # START
+    elif query.data == 'sched_add':
+        bot.editMessageText(text='Enter the number of your lesson(1-10)',
+                            chat_id=c_i, reply_markup=reply, message_id=m_i)
+        logger.info('Stage: Awaiting regex statement')
+        user_data['m_i'] = m_i
+        return 'sched_add_regex'
 
-    # ------------ Button 'DELETE' in schedule ------------ # END
+    elif query.data[:15] == 'sched_add_item_':
+        subject_id = int(query.data[15:])
+        lesson_id = int(user_data.pop('regex', '0'))-1
+        logger.info(f'Stage: Adding lesson. Lesson id: {lesson_id}, subject id: {subject_id}')
+        logger.info(f'Stage: Adding lesson. Existing schedule: {user_data["data"]["sched"][user_data["day"]]}')
+        user_sched = user_data['data']['sched'][user_data['day']]
+        if lesson_id < len(user_sched):
+            user_data['data']['sched'][user_data['day']][lesson_id] = subject_id
+        else:
+            for i in range(len(user_sched), lesson_id-1):
+                user_data['data']['sched'][user_data['day']].append(-1)
+            user_data['data']['sched'][user_data['day']].append(subject_id)
+        set_data(query.message.chat_id, user_data['data'])
+        logger.info('= = = = = ADD: Finished = = = = =')
+        update.callback_query.data = user_data['day']
+        callback(bot, update, user_data)
+    # ------------ Button 'ADD' in schedule ------------ # END
     else:
         user_data['data'] = get_data(query.message.chat_id)  # Requesting schedule data
         user_sched = user_data['data']['sched']
@@ -180,7 +219,7 @@ My name is {bot_name} and I will help you getting track of your study schedule.'
                     logger.info(f'------ List of items: {user_sched[i]}')
                     user_data['day'] = i
                     view_schedule = [
-                        [InlineKeyboardButton(text='Add', callback_data='add')]
+                        [InlineKeyboardButton(text='Add', callback_data='sched_add')]
                     ]
                     # Cleaning up schedule in case it only consists of incorrect ids
                     tmp = 'No lessons yet!'
@@ -207,7 +246,10 @@ My name is {bot_name} and I will help you getting track of your study schedule.'
 def main():
     upd = Updater(settings.API_TOKEN)
     upd.dispatcher.add_handler(CommandHandler('start', start_bot))
-    upd.dispatcher.add_handler(CallbackQueryHandler(callback, pass_user_data=True))
+    upd.dispatcher.add_handler(ConversationHandler(entry_points=[CallbackQueryHandler(callback, pass_user_data=True)],
+                               states={'sched_add_regex': [RegexHandler('^([1-9]|10)$', regex_handler, pass_groups=True,
+                                                                        pass_user_data=True)]},
+                               fallbacks=[CallbackQueryHandler(callback, pass_user_data=True)]))
     upd.start_polling()
     upd.idle()
 
