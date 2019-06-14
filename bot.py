@@ -124,6 +124,7 @@ def callback(bot, update, user_data):
         bot.editMessageText(text=f'''Hello {user_name}!
 My name is {bot_name} and I will help you getting track of your study schedule.''',
                             chat_id=c_i, reply_markup=reply, message_id=m_i)
+        return ConversationHandler.END
 
 
     # ------------ Button 'DELETE' in schedule ------------ # START
@@ -190,7 +191,7 @@ My name is {bot_name} and I will help you getting track of your study schedule.'
         if lesson_id < len(user_sched):
             user_data['data']['sched'][user_data['day']][lesson_id] = subject_id
         else:
-            for i in range(len(user_sched), lesson_id-1):
+            for i in range(len(user_sched), lesson_id):
                 user_data['data']['sched'][user_data['day']].append(-1)
             user_data['data']['sched'][user_data['day']].append(subject_id)
         set_data(query.message.chat_id, user_data['data'])
@@ -198,6 +199,11 @@ My name is {bot_name} and I will help you getting track of your study schedule.'
         update.callback_query.data = user_data['day']
         callback(bot, update, user_data)
     # ------------ Button 'ADD' in schedule ------------ # END
+
+    # ------------ Button 'EDIT' in schedule ------------ # START
+
+    # ------------ Button 'EDIT' in schedule ------------ # END
+
     else:
         user_data['data'] = get_data(query.message.chat_id)  # Requesting schedule data
         user_sched = user_data['data']['sched']
