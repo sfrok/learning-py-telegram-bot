@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 from telegram.ext import Updater, CommandHandler, CallbackQueryHandler, ConversationHandler, RegexHandler
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 import settings
@@ -19,7 +18,7 @@ def start_bot(bot, update):
 
     reply_main_menu = InlineKeyboardMarkup(main_menu_markup)
     update.message.reply_text(f'''Hello {user_name}!
-My name is {bot_name} and I will help you getting track of your study schedule. 
+My name is {bot_name} and I will help you getting track of your study schedule.
 ''', reply_markup=reply_main_menu)
 
 
@@ -47,7 +46,7 @@ def get_data(id):
     default = {'items': lst, 'sched': sch}  # Setting a default library
 
     logger.info('= = = = = Requesting user info... = = = = =')
-    
+
     with open("db.json", "r", encoding='utf-8') as read_file:  # Reading dictionary from database (JSON file)
         user_info = json.load(read_file)
 
@@ -202,6 +201,46 @@ My name is {bot_name} and I will help you getting track of your study schedule.'
 
     # ------------ Button 'EDIT' in schedule ------------ # START
 
+    elif query.data == 'sched_edit':
+        day = user_data['day']
+        user_sched = user_data['data']['sched'][day]
+        subjects_list = user_data['data']['items']
+        logger.info('= = = = = EDITING: Editing an item in schedule... = = = = =')
+        logger.info(f'Callback: {query.data}\nDay index: {day}\nSchedule for this day:{user_sched}')
+        markup=[]
+        counter=1
+        for i in user_sched:
+            if -1 < int(i) < len(subjects_list):
+                subject = str(counter)+'. '+subjects_list[i]
+                markup.append([InlineKeyboardButton(text=subject, callback_data='edit_subject_num'+str(counter))])
+            counter+=1
+        markup.append([InlineKeyboardButton(text='Cancel', callback_data=day)])
+        reply=InlineKeyboardMarkup(markup)
+        logger.info('= = = = = EDITING: Created a message, waiting for callback = = = = =')
+        bot.editMessageText(text='Enter the number lesson which you want to edit', chat_id=c_i, reply_markup=reply, message_id=m_i)
+
+    elif query.data[:16] == 'edit_subject_num':
+        user_data['lesson']=query.data[16:]
+        subject_markup=[]
+        counter=1
+        for i in user_data['data']['items']:
+            subject_markup.append([InlineKeyboardButton(text=i, callback_data='sched_edit_item_'+str(counter-1))])
+            counter+=1
+        bot.sendMessage(text=f'You entered {user_data["lesson"]}, now select a subject',
+        reply_markup=InlineKeyboardMarkup(subject_markup), chat_id=c_i, message_id=m_i)
+
+    elif query.data[:16] == 'sched_edit_item_':
+        subject_id = int(query.data[16:])
+        lesson_id = int(user_data.pop('lesson','0'))-1
+        user_data['data']['sched'][user_data['day']][lesson_id]=subject_id
+        set_data(query.message.chat_id, user_data['data'])
+        logger.info('= = = = = EDIT: Finished = = = = =')
+        update.callback_query.data = user_data['day']
+        callback(bot, update, user_data)
+
+
+
+
     # ------------ Button 'EDIT' in schedule ------------ # END
 
     else:
@@ -240,7 +279,8 @@ My name is {bot_name} and I will help you getting track of your study schedule.'
                             n += 1
 
                         # edit, delete
-                        
+                        view_schedule.append([InlineKeyboardButton(text='Edit', callback_data='sched_edit')])
+
                         view_schedule.append([InlineKeyboardButton(text='Delete', callback_data='sched_del_start')])
 
                     view_schedule.append([InlineKeyboardButton(text='Back', callback_data='back_to_main_menu')])
