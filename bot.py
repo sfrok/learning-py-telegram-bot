@@ -2,7 +2,8 @@ from telegram.ext import Updater, CommandHandler, CallbackQueryHandler, Conversa
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 import settings
 import logs
-import json
+import data
+
 
 logger = None
 
@@ -20,60 +21,6 @@ def start_bot(bot, update):
     update.message.reply_text(f'''Hello {user_name}!
 My name is {bot_name} and I will help you getting track of your study schedule.
 ''', reply_markup=reply_main_menu)
-
-
-# Reading and saving JSON data
-def get_data(id):
-    id = str(id)
-    lst = [
-        'Physical Education',
-        'Computer architecture',
-        'System Programming',
-        'Computer networks',
-        'Peripherals',
-        'Mechanical drawing',
-        'Computer circuitry'
-    ]
-    sch = {
-        'Monday': [],
-        'Tuesday': [],
-        'Wednesday': [],
-        'Thursday': [],
-        'Friday': [],
-        'Saturday': [],
-        'Sunday': []
-    }
-    default = {'items': lst, 'sched': sch}  # Setting a default library
-
-    logger.info('= = = = = Requesting user info... = = = = =')
-
-    with open("db.json", "r", encoding='utf-8') as read_file:  # Reading dictionary from database (JSON file)
-        user_info = json.load(read_file)
-
-    logger.info(f'Input user id: {id}')
-    logger.info(f'Result (if not found or empty you will see default settings):\n{user_info.get(id, default)}')
-
-    if user_info.get(id, 0) == 0:  # Looking for our user's ID in the dictionary
-        user_info.update({id: default})  # If ID is not found, then creating a new entry
-        with open("db.json", "w", encoding='utf-8') as write_file:  # Rewriting new data in case of new entry
-            json.dump(user_info, write_file, ensure_ascii=False)
-        logger.info('Created new entry')
-
-    logger.info('= = = = = Request completed = = = = =')
-    return user_info[id]
-
-
-# Updating JSON data
-def set_data(id, data):
-    id = str(id)
-    logger.info('= = = = = Saving user info... = = = = =')
-    logger.info(f'Input user id: {id}')
-    with open("db.json", "r", encoding='utf-8') as read_file:  # Reading dictionary from database (JSON file)
-        user_info = json.load(read_file)
-    user_info.update({id: data})
-    with open("db.json", "w", encoding='utf-8') as write_file:
-        json.dump(user_info, write_file, ensure_ascii=False)
-    logger.info('= = = = = Save completed = = = = =')
 
 
 def regex_handler(bot, update, groups, user_data):
@@ -94,7 +41,6 @@ def regex_handler(bot, update, groups, user_data):
 
 
 def callback(bot, update, user_data):
-
     back_to_main_menu = [
         [InlineKeyboardButton(text='Back', callback_data='back_to_main_menu')],
     ]
@@ -105,7 +51,7 @@ def callback(bot, update, user_data):
     m_i = query.message.message_id
 
     if query.data == 'subjects':
-        user_data['data'] = get_data(query.message.chat_id)  # Requesting schedule data
+        user_data['data'] = data.get_data(query.message.chat_id)  # Requesting schedule data
         tmp = '\n'.join(sorted(user_data['data']['items']))
         logger.info('Subjects list created')
         bot.editMessageText(text=f"Here's the list of available subjects:\n{tmp}",
@@ -138,7 +84,7 @@ My name is {bot_name} and I will help you getting track of your study schedule.'
         for j in user_sched:
             if -1 < int(j) < len(user_list):
                 tmp = str(n) + '. ' + user_list[j]
-                markup.append([InlineKeyboardButton(text=tmp, callback_data='sched_del_item_'+str(n-1))])
+                markup.append([InlineKeyboardButton(text=tmp, callback_data='sched_del_item_' + str(n - 1))])
             n += 1
         markup.append([InlineKeyboardButton(text='Delete all', callback_data='sched_del_all')])
         markup.append([InlineKeyboardButton(text='Cancel', callback_data=day)])
@@ -158,7 +104,7 @@ My name is {bot_name} and I will help you getting track of your study schedule.'
                 empty = False
         if empty:
             user_data['data']['sched'][day] = []
-        set_data(query.message.chat_id, user_data['data'])
+        data.set_data(query.message.chat_id, user_data['data'])
         logger.info('= = = = = DELETING: Finished = = = = =')
         update.callback_query.data = day
         callback(bot, update, user_data)
@@ -167,7 +113,7 @@ My name is {bot_name} and I will help you getting track of your study schedule.'
         day = user_data['day']
         logger.info(f'Deleting all items in the schedule for this day: {day}')
         user_data['data']['sched'][day] = []
-        set_data(query.message.chat_id, user_data['data'])
+        data.set_data(query.message.chat_id, user_data['data'])
         logger.info('= = = = = DELETING: Finished = = = = =')
         update.callback_query.data = day
         callback(bot, update, user_data)
@@ -175,6 +121,7 @@ My name is {bot_name} and I will help you getting track of your study schedule.'
 
     # ------------ Button 'ADD' in schedule ------------ # START
     elif query.data == 'sched_add':
+        logger.info('= = = = = ADDING: STARTED = = = = =')
         bot.editMessageText(text='Enter the number of your lesson(1-10)',
                             chat_id=c_i, reply_markup=reply, message_id=m_i)
         logger.info('Stage: Awaiting regex statement')
@@ -183,7 +130,7 @@ My name is {bot_name} and I will help you getting track of your study schedule.'
 
     elif query.data[:15] == 'sched_add_item_':
         subject_id = int(query.data[15:])
-        lesson_id = int(user_data.pop('regex', '0'))-1
+        lesson_id = int(user_data.pop('regex', '0')) - 1
         logger.info(f'Stage: Adding lesson. Lesson id: {lesson_id}, subject id: {subject_id}')
         logger.info(f'Stage: Adding lesson. Existing schedule: {user_data["data"]["sched"][user_data["day"]]}')
         user_sched = user_data['data']['sched'][user_data['day']]
@@ -193,8 +140,8 @@ My name is {bot_name} and I will help you getting track of your study schedule.'
             for i in range(len(user_sched), lesson_id):
                 user_data['data']['sched'][user_data['day']].append(-1)
             user_data['data']['sched'][user_data['day']].append(subject_id)
-        set_data(query.message.chat_id, user_data['data'])
-        logger.info('= = = = = ADD: Finished = = = = =')
+        data.set_data(query.message.chat_id, user_data['data'])
+        logger.info('= = = = = ADDING: Finished = = = = =')
         update.callback_query.data = user_data['day']
         callback(bot, update, user_data)
     # ------------ Button 'ADD' in schedule ------------ # END
@@ -207,44 +154,43 @@ My name is {bot_name} and I will help you getting track of your study schedule.'
         subjects_list = user_data['data']['items']
         logger.info('= = = = = EDITING: Editing an item in schedule... = = = = =')
         logger.info(f'Callback: {query.data}\nDay index: {day}\nSchedule for this day:{user_sched}')
-        markup=[]
-        counter=1
+        markup = []
+        counter = 1
         for i in user_sched:
             if -1 < int(i) < len(subjects_list):
-                subject = str(counter)+'. '+subjects_list[i]
-                markup.append([InlineKeyboardButton(text=subject, callback_data='edit_subject_num'+str(counter))])
-            counter+=1
+                subject = str(counter) + '. ' + subjects_list[i]
+                markup.append([InlineKeyboardButton(text=subject, callback_data='edit_subject_num' + str(counter))])
+            counter += 1
         markup.append([InlineKeyboardButton(text='Cancel', callback_data=day)])
-        reply=InlineKeyboardMarkup(markup)
-        logger.info('= = = = = EDITING: Created a message, waiting for callback = = = = =')
-        bot.editMessageText(text='Enter the number lesson which you want to edit', chat_id=c_i, reply_markup=reply, message_id=m_i)
+        reply = InlineKeyboardMarkup(markup)
+        bot.editMessageText(text='Enter the number lesson which you want to edit', chat_id=c_i, reply_markup=reply,
+                            message_id=m_i)
+        logger.info('Created a schedule message, awaiting callback')
 
     elif query.data[:16] == 'edit_subject_num':
-        user_data['lesson']=query.data[16:]
-        subject_markup=[]
-        counter=1
+        user_data['lesson'] = query.data[16:]
+        subject_markup = []
+        counter = 1
         for i in user_data['data']['items']:
-            subject_markup.append([InlineKeyboardButton(text=i, callback_data='sched_edit_item_'+str(counter-1))])
-            counter+=1
+            subject_markup.append([InlineKeyboardButton(text=i, callback_data='sched_edit_item_' + str(counter - 1))])
+            counter += 1
         bot.sendMessage(text=f'You entered {user_data["lesson"]}, now select a subject',
-        reply_markup=InlineKeyboardMarkup(subject_markup), chat_id=c_i, message_id=m_i)
+                        reply_markup=InlineKeyboardMarkup(subject_markup), chat_id=c_i, message_id=m_i)
+        logger.info('Created a subject list, awaiting callback')
 
     elif query.data[:16] == 'sched_edit_item_':
         subject_id = int(query.data[16:])
-        lesson_id = int(user_data.pop('lesson','0'))-1
-        user_data['data']['sched'][user_data['day']][lesson_id]=subject_id
-        set_data(query.message.chat_id, user_data['data'])
-        logger.info('= = = = = EDIT: Finished = = = = =')
+        lesson_id = int(user_data.pop('lesson', '0')) - 1
+        user_data['data']['sched'][user_data['day']][lesson_id] = subject_id
+        data.set_data(query.message.chat_id, user_data['data'])
+        logger.info('= = = = = EDITING: Finished = = = = =')
         update.callback_query.data = user_data['day']
         callback(bot, update, user_data)
-
-
-
 
     # ------------ Button 'EDIT' in schedule ------------ # END
 
     else:
-        user_data['data'] = get_data(query.message.chat_id)  # Requesting schedule data
+        user_data['data'] = data.get_data(query.message.chat_id)  # Requesting schedule data
         user_sched = user_data['data']['sched']
         days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
 
@@ -293,9 +239,10 @@ def main():
     upd = Updater(settings.API_TOKEN)
     upd.dispatcher.add_handler(CommandHandler('start', start_bot))
     upd.dispatcher.add_handler(ConversationHandler(entry_points=[CallbackQueryHandler(callback, pass_user_data=True)],
-                               states={'sched_add_regex': [RegexHandler('^([1-9]|10)$', regex_handler, pass_groups=True,
-                                                                        pass_user_data=True)]},
-                               fallbacks=[CallbackQueryHandler(callback, pass_user_data=True)]))
+                                                   states={'sched_add_regex': [
+                                                       RegexHandler('^([1-9]|10)$', regex_handler, pass_groups=True,
+                                                                    pass_user_data=True)]},
+                                                   fallbacks=[CallbackQueryHandler(callback, pass_user_data=True)]))
     upd.start_polling()
     upd.idle()
 
