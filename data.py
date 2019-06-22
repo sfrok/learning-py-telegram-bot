@@ -5,7 +5,7 @@ import json
 logger = logs.main_logger
 
 
-# Reading and saving JSON data
+# Reading JSON data
 def get_data(id):
     id = str(id)
     lst = [
@@ -17,6 +17,7 @@ def get_data(id):
         'Mechanical drawing',
         'Computer circuitry'
     ]
+    lst = sorted(lst)
     sch = {
         'Monday': [],
         'Tuesday': [],
@@ -57,3 +58,16 @@ def set_data(id, data):
     with open("db.json", "w", encoding='utf-8') as write_file:
         json.dump(user_info, write_file, ensure_ascii=False)
     logger.info('= = = = = Save completed = = = = =')
+
+
+# Clearing schedule
+def sched_clear(sched, items):
+    logger.info(f'sched_clear(): Started. Input: {sched}, {items}')
+    empty = True
+    for j in sched:
+        if -1 < int(j) < len(items):
+            empty = False
+    if empty:
+        sched = []
+    logger.info(f'sched_clear(): Finished. Result: {sched}')
+    return sched
