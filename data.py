@@ -5,23 +5,21 @@ import json
 logger = logs.main_logger
 
 # Indexing callback data
-cb = {
-    'main': 'back_to_main_menu',
-    'subj': 'subjects',
-    'sch': 'schedule',
-    'sch_del1': 'sched_del_start',
-    'sch_del2': 'sched_del_item_',
-    'sch_del3': 'sched_del_all',
-    'sch_add1': 'sched_add',
-    'sch_add2': 'sched_add_item_',
-    'sch_edi1': 'sched_edit',
-    'sch_edi2': 'sched_edit_subj_',
-    'sch_edi3': 'sched_edit_item_',
-    'subj_del1': 'subj_del_start',
-    'subj_del2': 'subj_del_item_',
-    'subj_del3': 'subj_del_all',
-    'subj_add1': 'add_subject'
-}
+cbMain = 'back_to_main_menu'
+cbSubj = 'subjects'
+cbSch = 'schedule'
+cbSch_del1 = 'sched_del_start'
+cbSch_del2 = 'sched_del_item_'
+cbSch_del3 = 'sched_del_all'
+cbSch_add1 = 'sched_add'
+cbSch_add2 = 'sched_add_item_'
+cbSch_edi1 = 'sched_edit'
+cbSch_edi2 = 'sched_edit_subj_'
+cbSch_edi3 = 'sched_edit_item_'
+cbSubj_del1 = 'subj_del_start'
+cbSubj_del2 = 'subj_del_item_'
+cbSubj_del3 = 'subj_del_all'
+cbSubj_add1 = 'add_subject'
 
 
 # Reading JSON data
