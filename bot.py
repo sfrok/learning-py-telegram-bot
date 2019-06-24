@@ -41,6 +41,7 @@ def add_subject(bot, update, user_data):
             bot.editMessageText(text=f'This subject already in your list, enter another name. ',
                                 reply_markup=reply, chat_id=update.message.chat_id,
                                 message_id=user_data['m_i'])
+            break
     if not is_clone:
         logger.info(f'User gave name of subject to add -> {subject_name}')
         subjects.append(subject_name)
