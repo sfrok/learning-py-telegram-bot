@@ -124,8 +124,8 @@ My name is {bot_name} and I will help you getting track of your study schedule.'
         bot.editMessageText(text='Select what you want to delete:',
                             chat_id=c_i, reply_markup=reply, message_id=m_i)
 
-    elif query.data[:15] == data.cb['sch_del2']:
-        item_id = int(query.data[15:])
+    elif query.data[:len(data.cb['sch_del2'])] == data.cb['sch_del2']:
+        item_id = int(query.data[len(data.cb['sch_del2']):])
         day = user_data['day']
         logger.info(f'Callback: {query.data}\nDeleting item #{item_id} in the schedule for this day: {day}')
         user_data['data']['sched'][day][item_id] = -1
@@ -155,8 +155,8 @@ My name is {bot_name} and I will help you getting track of your study schedule.'
         user_data['m_i'] = m_i
         return 'sched_add_regex'
 
-    elif query.data[:15] == data.cb['sch_add2']:
-        subject_id = int(query.data[15:])
+    elif query.data[:len(data.cb['sch_add2'])] == data.cb['sch_add2']:
+        subject_id = int(query.data[len(data.cb['sch_add2']):])
         lesson_id = int(user_data.pop('regex', '0')) - 1
         logger.info(f'Stage: Adding lesson. Lesson id: {lesson_id}, subject id: {subject_id}')
         logger.info(f'Stage: Adding lesson. Schedule before: {user_data["data"]["sched"][user_data["day"]]}')
@@ -195,8 +195,8 @@ My name is {bot_name} and I will help you getting track of your study schedule.'
                             message_id=m_i)
         logger.info('Created a schedule message, awaiting callback')
 
-    elif query.data[:16] == data.cb['sch_edi2']:
-        user_data['lesson'] = query.data[16:]
+    elif query.data[:len(data.cb['sch_edi2'])] == data.cb['sch_edi2']:
+        user_data['lesson'] = query.data[len(data.cb['sch_edi2']):]
         markup = []
         n = 0
         for i in user_data['data']['items']:
@@ -206,8 +206,8 @@ My name is {bot_name} and I will help you getting track of your study schedule.'
                         reply_markup=InlineKeyboardMarkup(markup), chat_id=c_i, message_id=m_i)
         logger.info('Created a subject list, awaiting callback')
 
-    elif query.data[:16] == data.cb['sch_edi3']:
-        subject_id = int(query.data[16:])
+    elif query.data[:len(data.cb['sch_edi3'])] == data.cb['sch_edi3']:
+        subject_id = int(query.data[len(data.cb['sch_edi3']):])
         lesson_id = int(user_data.pop('lesson', '0')) - 1
         user_data['data']['sched'][user_data['day']][lesson_id] = subject_id
         data.set_data(query.message.chat_id, user_data['data'])
@@ -232,8 +232,8 @@ My name is {bot_name} and I will help you getting track of your study schedule.'
         bot.editMessageText(text='Select what you want to delete:',
                             chat_id=c_i, reply_markup=reply, message_id=m_i)
 
-    elif query.data[:14] == data.cb['subj_del2']:
-        item_id = int(query.data[14:])
+    elif query.data[:len(data.cb['subj_del2'])] == data.cb['subj_del2']:
+        item_id = int(query.data[len(data.cb['subj_del2']):])
         logger.info(f'Callback: {query.data}. Deleting item #{item_id} in the subject list')
         sched = user_data['data']['sched']
         subjects = user_data['data']['items']
