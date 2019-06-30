@@ -47,35 +47,31 @@ def get_data(id):
     }
     default = {'items': lst, 'sched': sch}  # Setting a default library
 
-    logger.info('= = = = = Requesting user info... = = = = =')
-
     with open("db.json", "r", encoding='utf-8') as read_file:  # Reading dictionary from database (JSON file)
         user_info = json.load(read_file)
 
-    logger.info(f'Input user id: {id}')
-    logger.info(f'Result (if not found or empty you will see default settings):\n{user_info.get(id, default)}')
+    logger.info(f'get_data(): Input user id: {id}. Result (if n/a you will see default):\n{user_info.get(id, default)}')
 
     if user_info.get(id, 0) == 0:  # Looking for our user's ID in the dictionary
         user_info.update({id: default})  # If ID is not found, then creating a new entry
         with open("db.json", "w", encoding='utf-8') as write_file:  # Rewriting new data in case of new entry
             json.dump(user_info, write_file, ensure_ascii=False)
-        logger.info('Created new entry')
+        logger.info('get_data(): Created new entry')
 
-    logger.info('= = = = = Request completed = = = = =')
+    logger.info('get_data(): Finished')
     return user_info[id]
 
 
 # Updating JSON data
 def set_data(id, data):
     id = str(id)
-    logger.info('= = = = = Saving user info... = = = = =')
-    logger.info(f'Input user id: {id}')
+    logger.info(f'set_data(): Input user id: {id}\nset_data(): Info: {data}')
     with open("db.json", "r", encoding='utf-8') as read_file:  # Reading dictionary from database (JSON file)
         user_info = json.load(read_file)
     user_info.update({id: data})
     with open("db.json", "w", encoding='utf-8') as write_file:
         json.dump(user_info, write_file, ensure_ascii=False)
-    logger.info('= = = = = Save completed = = = = =')
+    logger.info('set_data(): Finished')
 
 
 # Clearing schedule
