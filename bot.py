@@ -53,14 +53,15 @@ def edit_subject(bot, update, user_data):
         sched = user_data['data']['sched']
         for i in sched:
             for j in range(0, len(sched[i])):
+                logger.info(f'-in cycle. item_id: {subject_id}, sched[i][j]: {sched[i][j]}, '
+                            f'old_subject_id: {old_subject_id}, '
+                            f'len(subjects): {len(subjects)}')
                 if subject_id >= sched[i][j] > old_subject_id:
                     sched[i][j] += 1
-                    logger.info(f'-in cycle. item_id: {subject_id}, sched[i][j]: {sched[i][j]}, len(subjects) + 1: '
-                            f'{len(subjects) + 1}')
                 elif subject_id <= sched[i][j] < old_subject_id:
                     sched[i][j] -= 1
-                    logger.info(f'-in cycle. item_id: {subject_id}, sched[i][j]: {sched[i][j]}, len(subjects) - 1: '
-                                f'{len(subjects) - 1}')
+                elif old_subject_id == sched[i][j]:
+                    sched[i][j] = subject_id
             logger.info(f'-in cycle. user_data[data][sched][i]: {user_data["data"]["sched"][i]}')
         bot.deleteMessage(chat_id=update.message.chat_id, message_id=update.message.message_id)
         data.set_data(update.message.chat_id, user_data['data'])
