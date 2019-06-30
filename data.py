@@ -20,7 +20,8 @@ cbSubj_del1 = 'subj_del_start'
 cbSubj_del2 = 'subj_del_item_'
 cbSubj_del3 = 'subj_del_all'
 cbSubj_add1 = 'add_subject'
-
+cbSubj_edi1 = 'edit_subject_start'
+cbSubj_edi2 = 'edit_subject_item'
 
 # Reading JSON data
 def get_data(id):
