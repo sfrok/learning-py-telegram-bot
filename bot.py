@@ -29,6 +29,10 @@ def regex_handler(bot, update, groups, user_data):
 def edit_subject(bot, update, user_data):
     subjects = user_data['data']['items']
     new_subject_name = update.message.text
+    markup = [
+        [InlineKeyboardButton(text='Back', callback_data=data.cbMain)]
+    ]
+    reply = InlineKeyboardMarkup(markup)
     is_clone = False
     query = user_data['update'].callback_query
     old_subject_id = int(query.data[len(data.cbSubj_edi2):])
@@ -36,10 +40,10 @@ def edit_subject(bot, update, user_data):
         if new_subject_name == subject:
             is_clone = True
             bot.deleteMessage(chat_id=update.message.chat_id, message_id=update.message.message_id)
-            bot.editMessageText(text=f'This subject already in your list, enter another name. ',
-                                chat_id=update.message.chat_id,
+            bot.editMessageText(text=f'This subject already in your list, enter another name.',
+                                reply_markup=reply, chat_id=update.message.chat_id,
                                 message_id=user_data['m_i'])
-            break
+            return 'edit_subject'
     if not is_clone:
         logger.info(f'User gave name of subject to add -> {new_subject_name}')
         user_data['data']['items'][old_subject_id] = new_subject_name
@@ -49,10 +53,10 @@ def edit_subject(bot, update, user_data):
         sched = user_data['data']['sched']
         for i in sched:
             for j in range(0, len(sched[i])):
-                logger.info(f'-in cycle. item_id: {subject_id}, sched[i][j]: {sched[i][j]}, len(subjects) + 1: '
-                            f'{len(subjects) + 1}')
                 if subject_id >= sched[i][j] > old_subject_id:
                     sched[i][j] += 1
+                    logger.info(f'-in cycle. item_id: {subject_id}, sched[i][j]: {sched[i][j]}, len(subjects) + 1: '
+                            f'{len(subjects) + 1}')
                 elif subject_id <= sched[i][j] < old_subject_id:
                     sched[i][j] -= 1
                     logger.info(f'-in cycle. item_id: {subject_id}, sched[i][j]: {sched[i][j]}, len(subjects) - 1: '
@@ -78,10 +82,10 @@ def add_subject(bot, update, user_data):
         if subject_name == subject:
             is_clone = True
             bot.deleteMessage(chat_id=update.message.chat_id, message_id=update.message.message_id)
-            bot.editMessageText(text=f'This subject already in your list, enter another name. ',
+            bot.editMessageText(text=f'This subject already in your list, enter another name.',
                                 reply_markup=reply, chat_id=update.message.chat_id,
                                 message_id=user_data['m_i'])
-            break
+            return 'add_subject'
     if not is_clone:
         logger.info(f'User gave name of subject to add -> {subject_name}')
         subjects.append(subject_name)
@@ -188,6 +192,7 @@ My name is {bot_name} and I will help you getting track of your study schedule.'
         callback(bot, update, user_data)
     # ------------ Button 'DELETE' in schedule ------------ # END
 
+
     # ------------ Button 'ADD' in schedule ------------ # START
     elif query.data == data.cbSch_add1:
         logger.info('= = = = = ADDING: STARTED = = = = =')
@@ -215,6 +220,7 @@ My name is {bot_name} and I will help you getting track of your study schedule.'
         update.callback_query.data = user_data['day']
         callback(bot, update, user_data)
     # ------------ Button 'ADD' in schedule ------------ # END
+
 
     # ------------ Button 'EDIT' in schedule ------------ # START
     elif query.data == data.cbSch_edi1:
@@ -256,6 +262,7 @@ My name is {bot_name} and I will help you getting track of your study schedule.'
         update.callback_query.data = user_data['day']
         callback(bot, update, user_data)
     # ------------ Button 'EDIT' in schedule ------------ # END
+
 
     # ------------ Button 'DELETE' in subjects ------------ # START
     elif query.data == data.cbSubj_del1:
@@ -305,6 +312,7 @@ My name is {bot_name} and I will help you getting track of your study schedule.'
         callback(bot, update, user_data)
     # ------------ Button 'DELETE' in subjects ------------ # END
 
+
     # ------------ Button 'ADD' in subjects ------------ # START
     elif query.data == data.cbSubj_add1:
         logger.info('= = = = = ADDING Subject: STARTED = = = = =')
@@ -315,6 +323,7 @@ My name is {bot_name} and I will help you getting track of your study schedule.'
         user_data['update'] = update
         return 'add_subject'
     # ------------ Button 'ADD' in subjects ------------ # END
+
 
     # ------------ Button 'EDIT' in subjects ------------ # START
     elif query.data == data.cbSubj_edi1:
@@ -337,8 +346,8 @@ My name is {bot_name} and I will help you getting track of your study schedule.'
         user_data['m_i'] = m_i
         user_data['update'] = update
         return 'edit_subject'
-
     # ------------ Button 'EDIT' in subjects ------------ # END
+
 
     else:
         user_data['data'] = data.get_data(query.message.chat_id)  # Requesting schedule data
