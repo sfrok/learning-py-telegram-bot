@@ -1,10 +1,10 @@
-from telegram.ext import Updater, CommandHandler, CallbackQueryHandler, ConversationHandler, RegexHandler, MessageHandler, Filters
+from telegram.ext import Updater, CommandHandler, CallbackQueryHandler, ConversationHandler, RegexHandler, \
+    MessageHandler, Filters
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 from greet import start_bot
 import settings
 import logs
 import data
-
 
 logger = None
 
@@ -25,7 +25,8 @@ def regex_handler(bot, update, groups, user_data):
     logger.info(f'Stage: End of regex conversation. Value to pass: {groups[0]}, callback_data: sched_add_item_{i}')
     return ConversationHandler.END
 
-def edit_subject(bot,update,user_data):
+
+def edit_subject(bot, update, user_data):
     subjects = user_data['data']['items']
     new_subject_name = update.message.text
     is_clone = False
@@ -36,10 +37,11 @@ def edit_subject(bot,update,user_data):
             is_clone = True
             bot.deleteMessage(chat_id=update.message.chat_id, message_id=update.message.message_id)
             bot.editMessageText(text=f'This subject already in your list, enter another name. ',
-                                reply_markup=reply, chat_id=update.message.chat_id,
+                                chat_id=update.message.chat_id,
                                 message_id=user_data['m_i'])
             break
     if not is_clone:
+        logger.info(f'User gave name of subject to add -> {new_subject_name}')
         user_data['data']['items'][old_subject_id] = new_subject_name
         user_data['data']['items'] = sorted(subjects)
         subjects = user_data['data']['items']
@@ -47,16 +49,22 @@ def edit_subject(bot,update,user_data):
         sched = user_data['data']['sched']
         for i in sched:
             for j in range(0, len(sched[i])):
+                logger.info(f'-in cycle. item_id: {subject_id}, sched[i][j]: {sched[i][j]}, len(subjects) + 1: '
+                            f'{len(subjects) + 1}')
                 if subject_id >= sched[i][j] > old_subject_id:
-                    sched[i][j]+=1
+                    sched[i][j] += 1
                 elif subject_id <= sched[i][j] < old_subject_id:
-                    sched[i][j]-=1
+                    sched[i][j] -= 1
+                    logger.info(f'-in cycle. item_id: {subject_id}, sched[i][j]: {sched[i][j]}, len(subjects) - 1: '
+                                f'{len(subjects) - 1}')
+            logger.info(f'-in cycle. user_data[data][sched][i]: {user_data["data"]["sched"][i]}')
         bot.deleteMessage(chat_id=update.message.chat_id, message_id=update.message.message_id)
         data.set_data(update.message.chat_id, user_data['data'])
         user_data['update'].callback_query.data = data.cbSubj
         callback(bot, user_data.pop('update', 0), user_data)
         logger.info('= = = = = EDITING Subject: FINISHED = = = = =')
     return ConversationHandler.END
+
 
 def add_subject(bot, update, user_data):
     subjects = user_data['data']['items']
@@ -180,7 +188,6 @@ My name is {bot_name} and I will help you getting track of your study schedule.'
         callback(bot, update, user_data)
     # ------------ Button 'DELETE' in schedule ------------ # END
 
-
     # ------------ Button 'ADD' in schedule ------------ # START
     elif query.data == data.cbSch_add1:
         logger.info('= = = = = ADDING: STARTED = = = = =')
@@ -208,7 +215,6 @@ My name is {bot_name} and I will help you getting track of your study schedule.'
         update.callback_query.data = user_data['day']
         callback(bot, update, user_data)
     # ------------ Button 'ADD' in schedule ------------ # END
-
 
     # ------------ Button 'EDIT' in schedule ------------ # START
     elif query.data == data.cbSch_edi1:
@@ -238,7 +244,7 @@ My name is {bot_name} and I will help you getting track of your study schedule.'
             markup.append([InlineKeyboardButton(text=i, callback_data=data.cbSch_edi3 + str(n))])
             n += 1
         bot.editMessageText(text=f'You entered {user_data["lesson"]}, now select a subject',
-                        reply_markup=InlineKeyboardMarkup(markup), chat_id=c_i, message_id=m_i)
+                            reply_markup=InlineKeyboardMarkup(markup), chat_id=c_i, message_id=m_i)
         logger.info('Created a subject list, awaiting callback')
 
     elif query.data[:len(data.cbSch_edi3)] == data.cbSch_edi3:
@@ -250,7 +256,6 @@ My name is {bot_name} and I will help you getting track of your study schedule.'
         update.callback_query.data = user_data['day']
         callback(bot, update, user_data)
     # ------------ Button 'EDIT' in schedule ------------ # END
-
 
     # ------------ Button 'DELETE' in subjects ------------ # START
     elif query.data == data.cbSubj_del1:
@@ -274,8 +279,8 @@ My name is {bot_name} and I will help you getting track of your study schedule.'
         subjects = user_data['data']['items']
         subjects.remove(subjects[item_id])
         subjects = sorted(subjects)
-        for i in (sched):
-            for j in range (0, len(sched[i])):
+        for i in sched:
+            for j in range(0, len(sched[i])):
                 logger.info(f'-in cycle. item_id: {item_id}, sched[i][j]: {sched[i][j]}, len(subjects) + 1: {len(subjects) + 1}')
                 if sched[i][j] == item_id:
                     sched[i][j] = -1
@@ -300,7 +305,6 @@ My name is {bot_name} and I will help you getting track of your study schedule.'
         callback(bot, update, user_data)
     # ------------ Button 'DELETE' in subjects ------------ # END
 
-
     # ------------ Button 'ADD' in subjects ------------ # START
     elif query.data == data.cbSubj_add1:
         logger.info('= = = = = ADDING Subject: STARTED = = = = =')
@@ -311,7 +315,6 @@ My name is {bot_name} and I will help you getting track of your study schedule.'
         user_data['update'] = update
         return 'add_subject'
     # ------------ Button 'ADD' in subjects ------------ # END
-
 
     # ------------ Button 'EDIT' in subjects ------------ # START
     elif query.data == data.cbSubj_edi1:
@@ -328,7 +331,6 @@ My name is {bot_name} and I will help you getting track of your study schedule.'
                             chat_id=c_i, reply_markup=reply, message_id=m_i)
 
     elif query.data[:len(data.cbSubj_edi2)] == data.cbSubj_edi2:
-        #logger.info(f'Callback: {query.data}. Editing item #{old_subject_id} in the subject list')
         bot.editMessageText(text='Enter the name of your subject', chat_id=c_i,
                             reply_markup=reply,
                             message_id=m_i)
@@ -391,10 +393,10 @@ def main():
                                                    states={'sched_add_regex': [
                                                        RegexHandler('^([1-9]|10)$', regex_handler, pass_groups=True,
                                                                     pass_user_data=True)],
-                                                           'add_subject': [MessageHandler(Filters.text, add_subject,
-                                                                                          pass_user_data=True)],
-                                                           'edit_subject': [MessageHandler(Filters.text, edit_subject,
-                                                                                          pass_user_data=True)]},
+                                                       'add_subject': [MessageHandler(Filters.text, add_subject,
+                                                                                      pass_user_data=True)],
+                                                       'edit_subject': [MessageHandler(Filters.text, edit_subject,
+                                                                                       pass_user_data=True)]},
                                                    fallbacks=[CallbackQueryHandler(callback, pass_user_data=True)]))
     upd.start_polling()
     upd.idle()
