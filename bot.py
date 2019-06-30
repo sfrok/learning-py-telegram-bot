@@ -25,6 +25,38 @@ def regex_handler(bot, update, groups, user_data):
     logger.info(f'Stage: End of regex conversation. Value to pass: {groups[0]}, callback_data: sched_add_item_{i}')
     return ConversationHandler.END
 
+def edit_subject(bot,update,user_data):
+    subjects = user_data['data']['items']
+    new_subject_name = update.message.text
+    is_clone = False
+    query = user_data['update'].callback_query
+    old_subject_id = int(query.data[len(data.cbSubj_edi2):])
+    for subject in subjects:
+        if new_subject_name == subject:
+            is_clone = True
+            bot.deleteMessage(chat_id=update.message.chat_id, message_id=update.message.message_id)
+            bot.editMessageText(text=f'This subject already in your list, enter another name. ',
+                                reply_markup=reply, chat_id=update.message.chat_id,
+                                message_id=user_data['m_i'])
+            break
+    if not is_clone:
+        user_data['data']['items'][old_subject_id] = new_subject_name
+        user_data['data']['items'] = sorted(subjects)
+        subjects = user_data['data']['items']
+        subject_id = subjects.index(new_subject_name)
+        sched = user_data['data']['sched']
+        for i in sched:
+            for j in range(0, len(sched[i])):
+                if subject_id >= sched[i][j] > old_subject_id:
+                    sched[i][j]+=1
+                elif subject_id <= sched[i][j] < old_subject_id:
+                    sched[i][j]-=1
+        bot.deleteMessage(chat_id=update.message.chat_id, message_id=update.message.message_id)
+        data.set_data(update.message.chat_id, user_data['data'])
+        user_data['update'].callback_query.data = data.cbSubj
+        callback(bot, user_data.pop('update', 0), user_data)
+        logger.info('= = = = = EDITING Subject: FINISHED = = = = =')
+    return ConversationHandler.END
 
 def add_subject(bot, update, user_data):
     subjects = user_data['data']['items']
@@ -49,7 +81,7 @@ def add_subject(bot, update, user_data):
         subjects = user_data['data']['items']
         subject_id = subjects.index(subject_name)
         sched = user_data['data']['sched']
-        for i in (sched):
+        for i in sched:
             for j in range(0, len(sched[i])):
                 logger.info(f'-in cycle. item_id: {subject_id}, sched[i][j]: {sched[i][j]}, len(subjects) + 1: '
                             f'{len(subjects) + 1}')
@@ -79,16 +111,18 @@ def callback(bot, update, user_data):
         if user_data['data']['items'] != []:
             tmp = '\n'.join(sorted(user_data['data']['items']))
             logger.info('Subjects list created')
-            markup.insert(1, [InlineKeyboardButton(text='Delete', callback_data=data.cbSubj_del1)])
+            markup.insert(1, [InlineKeyboardButton(text='Edit', callback_data=data.cbSubj_edi1)])
+            markup.insert(2, [InlineKeyboardButton(text='Delete', callback_data=data.cbSubj_del1)])
             reply = InlineKeyboardMarkup(markup)
             bot.editMessageText(text=f"Here's the list of available subjects:\n{tmp}",
                                 chat_id=c_i, reply_markup=reply, message_id=m_i)
             logger.info('Stage: main menu')
+
         else:
             reply = InlineKeyboardMarkup(markup)
             bot.editMessageText(text="No subjects yet!",
                                 chat_id=c_i, reply_markup=reply, message_id=m_i)
-        
+
     elif query.data == data.cbMain:
         logger.info('Stage: Back to main menu')
         user_name = query.message.chat.first_name
@@ -279,6 +313,31 @@ My name is {bot_name} and I will help you getting track of your study schedule.'
     # ------------ Button 'ADD' in subjects ------------ # END
 
 
+    # ------------ Button 'EDIT' in subjects ------------ # START
+    elif query.data == data.cbSubj_edi1:
+        logger.info('= = = = = EDITING Subject: STARTED = = = = =')
+        markup = []
+        n = 0
+        for i in user_data['data']['items']:
+            markup.append([InlineKeyboardButton(text=i, callback_data=data.cbSubj_edi2 + str(n))])
+            n += 1
+        markup.append([InlineKeyboardButton(text='Cancel', callback_data=data.cbSubj)])
+        reply = InlineKeyboardMarkup(markup)
+        logger.info('= = = = = EDITING: Created a message, waiting for callback = = = = =')
+        bot.editMessageText(text='Select what you want to edit:',
+                            chat_id=c_i, reply_markup=reply, message_id=m_i)
+
+    elif query.data[:len(data.cbSubj_edi2)] == data.cbSubj_edi2:
+        #logger.info(f'Callback: {query.data}. Editing item #{old_subject_id} in the subject list')
+        bot.editMessageText(text='Enter the name of your subject', chat_id=c_i,
+                            reply_markup=reply,
+                            message_id=m_i)
+        user_data['m_i'] = m_i
+        user_data['update'] = update
+        return 'edit_subject'
+
+    # ------------ Button 'EDIT' in subjects ------------ # END
+
     else:
         user_data['data'] = data.get_data(query.message.chat_id)  # Requesting schedule data
         sched = user_data['data']['sched']
@@ -333,6 +392,8 @@ def main():
                                                        RegexHandler('^([1-9]|10)$', regex_handler, pass_groups=True,
                                                                     pass_user_data=True)],
                                                            'add_subject': [MessageHandler(Filters.text, add_subject,
+                                                                                          pass_user_data=True)],
+                                                           'edit_subject': [MessageHandler(Filters.text, edit_subject,
                                                                                           pass_user_data=True)]},
                                                    fallbacks=[CallbackQueryHandler(callback, pass_user_data=True)]))
     upd.start_polling()
