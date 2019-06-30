@@ -5,9 +5,9 @@ import json
 logger = logs.main_logger
 
 # Indexing callback data
-cbMain = 'back_to_main_menu'
-cbSubj = 'subjects'
-cbSch = 'schedule'
+cbMain = 'Back to main menu'
+cbSubj = 'Showing subject list'
+cbSch = 'Showing week days'
 cbSch_del1 = 'sched_del_start'
 cbSch_del2 = 'sched_del_item_'
 cbSch_del3 = 'sched_del_all'
@@ -22,6 +22,7 @@ cbSubj_del3 = 'subj_del_all'
 cbSubj_add1 = 'add_subject'
 cbSubj_edi1 = 'edit_subject_start'
 cbSubj_edi2 = 'edit_subject_item'
+def hello(user, bot): return f'Hello {user}!\nMy name is {bot} and I will help you getting track of your study schedule.'
 
 # Reading JSON data
 def get_data(id):
