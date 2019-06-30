@@ -40,29 +40,28 @@ def edit_subject(bot, update, user_data):
         if new_subject_name == subject:
             is_clone = True
             bot.deleteMessage(chat_id=update.message.chat_id, message_id=update.message.message_id)
-            bot.editMessageText(text=f'This subject already in your list, enter another name.',
+            bot.editMessageText(text=f'This subject is already in your list, enter another name.',
                                 reply_markup=reply, chat_id=update.message.chat_id,
                                 message_id=user_data['m_i'])
             return 'edit_subject'
     if not is_clone:
-        logger.info(f'User gave name of subject to add -> {new_subject_name}')
+        logger.info(f'Subject to add: {new_subject_name}')
         user_data['data']['items'][old_subject_id] = new_subject_name
         user_data['data']['items'] = sorted(subjects)
         subjects = user_data['data']['items']
         subject_id = subjects.index(new_subject_name)
-        sched = user_data['data']['sched']
+        sched = user_data['data']['sched'].copy()
         for i in sched:
+            logger.info(f'-in cycle. user_data["data"]["sched"][i]: {user_data["data"]["sched"][i]}')
             for j in range(0, len(sched[i])):
-                logger.info(f'-in cycle. item_id: {subject_id}, sched[i][j]: {sched[i][j]}, '
-                            f'old_subject_id: {old_subject_id}, '
-                            f'len(subjects): {len(subjects)}')
+                logger.info(f'-in cycle. new_pos: {subject_id}, iter: {sched[i][j]}, '
+                            f'old_pos: {old_subject_id}, ')
                 if subject_id >= sched[i][j] > old_subject_id:
-                    sched[i][j] += 1
+                    user_data['data']['sched'][i][j] -= 1
                 elif subject_id <= sched[i][j] < old_subject_id:
-                    sched[i][j] -= 1
+                    user_data['data']['sched'][i][j] += 1
                 elif old_subject_id == sched[i][j]:
-                    sched[i][j] = subject_id
-            logger.info(f'-in cycle. user_data[data][sched][i]: {user_data["data"]["sched"][i]}')
+                    user_data['data']['sched'][i][j] = subject_id
         bot.deleteMessage(chat_id=update.message.chat_id, message_id=update.message.message_id)
         data.set_data(update.message.chat_id, user_data['data'])
         user_data['update'].callback_query.data = data.cbSubj
@@ -83,12 +82,12 @@ def add_subject(bot, update, user_data):
         if subject_name == subject:
             is_clone = True
             bot.deleteMessage(chat_id=update.message.chat_id, message_id=update.message.message_id)
-            bot.editMessageText(text=f'This subject already in your list, enter another name.',
+            bot.editMessageText(text=f'This subject is already in your list, enter another name.',
                                 reply_markup=reply, chat_id=update.message.chat_id,
                                 message_id=user_data['m_i'])
             return 'add_subject'
     if not is_clone:
-        logger.info(f'User gave name of subject to add -> {subject_name}')
+        logger.info(f'Subject to add: {subject_name}')
         subjects.append(subject_name)
         user_data["data"]["items"] = sorted(subjects)
         subjects = user_data['data']['items']
@@ -101,7 +100,7 @@ def add_subject(bot, update, user_data):
                 if len(subjects) + 1 > sched[i][j] >= subject_id:
                     sched[i][j] += 1
             logger.info(f'-in cycle. user_data[data][sched][i]: {user_data["data"]["sched"][i]}')
-        logger.info(f'New list of subject -> {subjects}')
+        logger.info(f'New list of subjects: {subjects}')
         bot.deleteMessage(chat_id=update.message.chat_id, message_id=update.message.message_id)
         data.set_data(update.message.chat_id, user_data['data'])
         user_data['update'].callback_query.data = data.cbSubj
