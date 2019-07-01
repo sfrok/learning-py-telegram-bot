@@ -7,4 +7,4 @@ logging.basicConfig(format='[%(name)s] %(message)s',
                     filename='bot.log',
                     filemode="w"
                     )
-main_logger = logging.getLogger('PB')
+logger = logging.getLogger('PB')
