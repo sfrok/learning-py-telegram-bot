@@ -380,3 +380,16 @@ def callback(bot, update, user_data):
                     reply = InlineKeyboardMarkup(view_schedule)
                     bot.editMessageText(text=tmp,
                                         chat_id=c_i, reply_markup=reply, message_id=m_i)
+
+
+def clear_messages(bot, update):
+    logger.info('Stage: Entered /clear command')
+    mid = update.message.message_id
+    while mid >= 0:
+        try: 
+            bot.deleteMessage(chat_id=update.message.chat_id, message_id=mid)
+            logger.info(f'-in cycle: deleting message #{mid}')
+        except:
+            logger.info(f'-in cycle: deleting message #{mid} - error, exiting')
+            break
+        mid -= 1
