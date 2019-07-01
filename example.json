@@ -1,0 +1,118 @@
+{
+  'update_id': 327248736,
+  'message': {
+    'message_id': 1459,
+    'date': 1562000457,
+    'chat': {
+      'id': 248664749,
+      'type': 'private',
+      'username': 'devserhii',
+      'first_name': 'Sergey'
+    },
+    'entities': [],
+    'caption_entities': [],
+    'photo': [
+      {
+        'file_id': 'AgADAgADLasxG6JL0Ugb2YomfMNffYWxUQ8ABBcNyMeuv8rKcDgFAAEC',
+        'width': 90,
+        'height': 65,
+        'file_size': 1087
+      },
+      {
+        'file_id': 'AgADAgADLasxG6JL0Ugb2YomfMNffYWxUQ8ABDesi9YakGEOcTgFAAEC',
+        'width': 320,
+        'height': 232,
+        'file_size': 18880
+      },
+      {
+        'file_id': 'AgADAgADLasxG6JL0Ugb2YomfMNffYWxUQ8ABBSLyeDEEfxhczgFAAEC',
+        'width': 800,
+        'height': 581,
+        'file_size': 95313
+      },
+      {
+        'file_id': 'AgADAgADLasxG6JL0Ugb2YomfMNffYWxUQ8ABN-kH1w_UI_dcjgFAAEC',
+        'width': 1280,
+        'height': 929,
+        'file_size': 207906
+      }
+    ],
+    'new_chat_members': [],
+    'new_chat_photo': [],
+    'delete_chat_photo': False,
+    'group_chat_created': False,
+    'supergroup_chat_created': False,
+    'channel_chat_created': False,
+    'from': {
+      'id': 248664749,
+      'first_name': 'Sergey',
+      'is_bot': False,
+      'username': 'devserhii',
+      'language_code': 'en'
+    }
+  },
+  '_effective_user': {
+    'id': 248664749,
+    'first_name': 'Sergey',
+    'is_bot': False,
+    'username': 'devserhii',
+    'language_code': 'en'
+  },
+  '_effective_chat': {
+    'id': 248664749,
+    'type': 'private',
+    'username': 'devserhii',
+    'first_name': 'Sergey'
+  },
+  '_effective_message': {
+    'message_id': 1459,
+    'date': 1562000457,
+    'chat': {
+      'id': 248664749,
+      'type': 'private',
+      'username': 'devserhii',
+      'first_name': 'Sergey'
+    },
+    'entities': [],
+    'caption_entities': [],
+    'photo': [
+      {
+        'file_id': 'AgADAgADLasxG6JL0Ugb2YomfMNffYWxUQ8ABBcNyMeuv8rKcDgFAAEC',
+        'width': 90,
+        'height': 65,
+        'file_size': 1087
+      },
+      {
+        'file_id': 'AgADAgADLasxG6JL0Ugb2YomfMNffYWxUQ8ABDesi9YakGEOcTgFAAEC',
+        'width': 320,
+        'height': 232,
+        'file_size': 18880
+      },
+      {
+        'file_id': 'AgADAgADLasxG6JL0Ugb2YomfMNffYWxUQ8ABBSLyeDEEfxhczgFAAEC',
+        'width': 800,
+        'height': 581,
+        'file_size': 95313
+      },
+      {
+        'file_id': 'AgADAgADLasxG6JL0Ugb2YomfMNffYWxUQ8ABN-kH1w_UI_dcjgFAAEC',
+        'width': 1280,
+        'height': 929,
+        'file_size': 207906
+      }
+    ],
+    'new_chat_members': [],
+    'new_chat_photo': [],
+    'delete_chat_photo': False,
+    'group_chat_created': False,
+    'supergroup_chat_created': False,
+    'channel_chat_created': False,
+    'from': {
+      'id': 248664749,
+      'first_name': 'Sergey',
+      'is_bot': False,
+      'username': 'devserhii',
+      'language_code': 'en'
+    }
+  }
+}
