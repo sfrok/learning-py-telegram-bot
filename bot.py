@@ -1,7 +1,7 @@
 from telegram.ext import Updater, CommandHandler, CallbackQueryHandler, ConversationHandler, RegexHandler, \
     MessageHandler, Filters
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
-from handlers import regex_handler, add_subject, edit_subject, callback
+from handlers import regex_handler, add_subject, edit_subject, callback, clear_messages
 import data
 from media import photo
 
@@ -23,6 +23,7 @@ def start_bot(bot, update):
 def main():
     upd = Updater(data.settings.API_TOKEN)
     upd.dispatcher.add_handler(CommandHandler('start', start_bot))
+    upd.dispatcher.add_handler(CommandHandler('clear', clear_messages))
     upd.dispatcher.add_handler(ConversationHandler(entry_points=[CallbackQueryHandler(callback, pass_user_data=True)],
                                                    states={
                                                        'sched_add_regex': [RegexHandler('^([1-9]|10)$',
