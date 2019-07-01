@@ -342,6 +342,14 @@ def callback(bot, update, user_data):
     # ------------ Button 'EDIT' in subjects ------------ # END
 
 
+    # ------------ Button 'SHARE PHOTO'  ------------ # START
+    elif query.data == data.cbShare_photo:
+        logger.info('Created a message, awaiting photo')
+        bot.sendMessage(text='Give me your another photo', chat_id=c_i, message_id=m_i)
+        return 'photo'
+    # ------------ Button 'SHARE PHOTO' ------------ # END
+
+
     else:
         days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
 

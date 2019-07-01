@@ -3,14 +3,17 @@ from telegram.ext import Updater, CommandHandler, CallbackQueryHandler, Conversa
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 from handlers import regex_handler, add_subject, edit_subject, callback
 import data
+from media import photo
+
 logger = data.logger
 
 
 def start_bot(bot, update):
-
     markup = [
         [InlineKeyboardButton(text='Show subjects', callback_data=data.cbSubj)],
-        [InlineKeyboardButton(text='View schedule', callback_data=data.cbSch)]
+        [InlineKeyboardButton(text='View schedule', callback_data=data.cbSch)],
+        [InlineKeyboardButton(text='Share photo', callback_data=data.cbShare_photo)],
+
     ]
 
     reply = InlineKeyboardMarkup(markup)
@@ -21,13 +24,21 @@ def main():
     upd = Updater(data.settings.API_TOKEN)
     upd.dispatcher.add_handler(CommandHandler('start', start_bot))
     upd.dispatcher.add_handler(ConversationHandler(entry_points=[CallbackQueryHandler(callback, pass_user_data=True)],
-                                                   states={'sched_add_regex': [
-                                                       RegexHandler('^([1-9]|10)$', regex_handler, pass_groups=True,
-                                                                    pass_user_data=True)],
-                                                       'add_subject': [MessageHandler(Filters.text, add_subject,
+                                                   states={
+                                                       'sched_add_regex': [RegexHandler('^([1-9]|10)$',
+                                                                                        regex_handler,
+                                                                                        pass_groups=True,
+                                                                                        pass_user_data=True)],
+                                                       'add_subject': [MessageHandler(Filters.text,
+                                                                                      add_subject,
                                                                                       pass_user_data=True)],
-                                                       'edit_subject': [MessageHandler(Filters.text, edit_subject,
-                                                                                       pass_user_data=True)]},
+                                                       'edit_subject': [MessageHandler(Filters.text,
+                                                                                       edit_subject,
+                                                                                       pass_user_data=True)],
+                                                       'photo': [MessageHandler(Filters.photo,
+                                                                                photo.user_photo,
+                                                                                pass_user_data=True)]
+                                                   },
                                                    fallbacks=[CallbackQueryHandler(callback, pass_user_data=True)]))
     upd.start_polling()
     upd.idle()
