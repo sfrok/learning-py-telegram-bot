@@ -120,3 +120,5 @@ dmypy.json
 
 r.txt
 .vscode/
+
+.static/
