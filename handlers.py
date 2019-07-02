@@ -135,11 +135,23 @@ def callback(bot, update, user_data):
     elif query.data == data.cbMain:
         main_menu_markup = [
             [InlineKeyboardButton(text='Show subjects', callback_data=data.cbSubj)],
-            [InlineKeyboardButton(text='View schedule', callback_data=data.cbSch)]
+            [InlineKeyboardButton(text='View schedule', callback_data=data.cbSch)],
+            [InlineKeyboardButton(text='Media operations', callback_data=data.cbMedia_operations)],
         ]
         reply = InlineKeyboardMarkup(main_menu_markup)
         bot.editMessageText(text=data.hello(query.message.chat.first_name, bot.first_name),
                             chat_id=c_i, reply_markup=reply, message_id=m_i)
+        return ConversationHandler.END
+
+    elif query.data == data.cbMedia_operations:
+        media_operation_markup = [
+            [InlineKeyboardButton(text='Send photo', callback_data=data.cbShare_photo)],
+            [InlineKeyboardButton(text='Send document', callback_data=data.cbSend_file)],
+            [InlineKeyboardButton(text='Back', callback_data=data.cbMain)],
+        ]
+        media_reply = InlineKeyboardMarkup(media_operation_markup)
+        bot.editMessageText(text='Menu of the sending media',
+                            chat_id=c_i, reply_markup=media_reply, message_id=m_i)
         return ConversationHandler.END
 
 
@@ -344,11 +356,26 @@ def callback(bot, update, user_data):
 
     # ------------ Button 'SHARE PHOTO'  ------------ # START
     elif query.data == data.cbShare_photo:
+        main_menu_markup = [
+            [InlineKeyboardButton(text='Back', callback_data=data.cbMedia_operations)],
+        ]
+        reply = InlineKeyboardMarkup(main_menu_markup)
         logger.info('Created a message, awaiting photo')
-        bot.sendMessage(text='Give me your another photo', chat_id=c_i, message_id=m_i)
+        bot.editMessageText(text='Give me your another photo', chat_id=c_i, reply_markup=reply, message_id=m_i)
         return 'photo'
     # ------------ Button 'SHARE PHOTO' ------------ # END
 
+
+    # ------------ Button 'SEND FILE'  ------------ # START
+    elif query.data == data.cbSend_file:
+        main_menu_markup = [
+            [InlineKeyboardButton(text='Back', callback_data=data.cbMedia_operations)],
+        ]
+        reply = InlineKeyboardMarkup(main_menu_markup)
+        logger.info('Created a message, awaiting document')
+        bot.editMessageText(text='Give me your another file', chat_id=c_i, reply_markup=reply, message_id=m_i)
+        return 'file'
+    # ------------ Button 'SEND FILE' ------------ # END
 
     else:
         days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
