@@ -3,8 +3,8 @@ from telegram.ext import Updater, CommandHandler, CallbackQueryHandler, Conversa
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 from handlers import regex_handler, add_subject, edit_subject, callback, clear_messages
 import data
-from media import photo
-
+from media.photo import user_photo
+from media.file import user_file
 logger = data.logger
 
 
@@ -12,7 +12,7 @@ def start_bot(bot, update):
     markup = [
         [InlineKeyboardButton(text='Show subjects', callback_data=data.cbSubj)],
         [InlineKeyboardButton(text='View schedule', callback_data=data.cbSch)],
-        [InlineKeyboardButton(text='Share photo', callback_data=data.cbShare_photo)],
+        [InlineKeyboardButton(text='Media operations', callback_data=data.cbMedia_operations)]
 
     ]
 
@@ -37,8 +37,9 @@ def main():
                                                                                        edit_subject,
                                                                                        pass_user_data=True)],
                                                        'photo': [MessageHandler(Filters.photo,
-                                                                                photo.user_photo,
-                                                                                pass_user_data=True)]
+                                                                                user_photo)],
+                                                       'file': [MessageHandler(Filters.document,
+                                                                               user_file)]
                                                    },
                                                    fallbacks=[CallbackQueryHandler(callback, pass_user_data=True)]))
     upd.start_polling()
