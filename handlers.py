@@ -147,6 +147,7 @@ def callback(bot, update, user_data):
         media_operation_markup = [
             [InlineKeyboardButton(text='Send photo', callback_data=data.cbShare_photo)],
             [InlineKeyboardButton(text='Send document', callback_data=data.cbSend_file)],
+            [InlineKeyboardButton(text='Send sticker', callback_data=data.cbShare_cticker)],
             [InlineKeyboardButton(text='Back', callback_data=data.cbMain)],
         ]
         media_reply = InlineKeyboardMarkup(media_operation_markup)
@@ -377,6 +378,18 @@ def callback(bot, update, user_data):
         return 'file'
     # ------------ Button 'SEND FILE' ------------ # END
 
+
+    # ------------ Button 'SHARE STICKER  ------------ # START
+    elif query.data == data.cbShare_cticker:
+        main_menu_markup = [
+            [InlineKeyboardButton(text='Back', callback_data=data.cbMedia_operations)],
+        ]
+        reply = InlineKeyboardMarkup(main_menu_markup)
+        logger.info('Created a message, awaiting sticker')
+        bot.editMessageText(text='Give me your another sticker', chat_id=c_i, reply_markup=reply, message_id=m_i)
+        return 'sticker'
+    # ------------ Button 'SHARE STICKER' ------------ # END
+
     else:
         days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
 
@@ -421,7 +434,7 @@ def clear_messages(bot, update):
     logger.info('Stage: Entered /clear command')
     mid = update.message.message_id
     while mid >= 0:
-        try: 
+        try:
             bot.deleteMessage(chat_id=update.message.chat_id, message_id=mid)
             logger.info(f'-in cycle: deleting message #{mid}')
         except:

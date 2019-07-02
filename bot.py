@@ -5,6 +5,7 @@ from handlers import regex_handler, add_subject, edit_subject, callback, clear_m
 import data
 from media.photo import user_photo
 from media.file import user_file
+from media.sticker import user_scticker
 logger = data.logger
 
 
@@ -39,7 +40,9 @@ def main():
                                                        'photo': [MessageHandler(Filters.photo,
                                                                                 user_photo)],
                                                        'file': [MessageHandler(Filters.document,
-                                                                               user_file)]
+                                                                               user_file)],
+                                                       'sticker': [MessageHandler(Filters.sticker,
+                                                                                  user_scticker)]
                                                    },
                                                    fallbacks=[CallbackQueryHandler(callback, pass_user_data=True)]))
     upd.start_polling()
