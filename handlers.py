@@ -149,6 +149,7 @@ def callback(bot, update, user_data):
             [InlineKeyboardButton(text='Send sticker', callback_data=data.cbSend_sticker)],
             [InlineKeyboardButton(text='Send audio', callback_data=data.cbSend_audio)],
             [InlineKeyboardButton(text='Send video', callback_data=data.cbSend_video)],
+            [InlineKeyboardButton(text='Send animation', callback_data=data.cbSend_gif)],
             [InlineKeyboardButton(text='Back', callback_data=data.cbMain)],
         ]
         media_reply = InlineKeyboardMarkup(media_operation_markup)
@@ -419,6 +420,19 @@ def callback(bot, update, user_data):
         bot.editMessageText(text='Give me a video file', chat_id=c_i, reply_markup=reply, message_id=m_i)
         return 'video'
     # ------------ Button 'SHARE VIDEO' ------------ # END
+
+
+    # ------------ Button 'SHARE GIF'  ------------ # START
+    elif query.data == data.cbSend_gif:
+        markup = [
+            [InlineKeyboardButton(text='Back', callback_data=data.cbMediaOp)],
+        ]
+        reply = InlineKeyboardMarkup(markup)
+        logger.info(f'Created a message (id {m_i}), awaiting a .gif file')
+        user_data['m_i'] = m_i
+        bot.editMessageText(text='Give me a .gif file', chat_id=c_i, reply_markup=reply, message_id=m_i)
+        return 'animation'
+    # ------------ Button 'SHARE GIF' ------------ # END
 
     else:
         days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
