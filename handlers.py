@@ -8,8 +8,7 @@ logger = data.logger
 def regex_handler(bot, update, groups, user_data):
     logger.info(f'Stage: Received regex statement. Regex groups: {groups}')
     bot.deleteMessage(chat_id=update.message.chat_id, message_id=update.message.message_id)
-    bot.deleteMessage(chat_id=update.message.chat_id, message_id=user_data['m_i'])
-    user_data.pop('m_i')
+    bot.deleteMessage(chat_id=update.message.chat_id, message_id=user_data.pop('m_i'))
     user_data['regex'] = groups[0]
     markup = []
     n = 0
@@ -39,7 +38,7 @@ def edit_subject(bot, update, user_data):
             bot.deleteMessage(chat_id=update.message.chat_id, message_id=update.message.message_id)
             bot.editMessageText(text=f'This subject is already in your list, enter another name.',
                                 reply_markup=reply, chat_id=update.message.chat_id,
-                                message_id=user_data['m_i'])
+                                message_id=user_data.pop('m_i'))
             return 'edit_subject'
     if not is_clone:
         logger.info(f'Subject to add: {new_subject_name}')
@@ -136,22 +135,24 @@ def callback(bot, update, user_data):
         main_menu_markup = [
             [InlineKeyboardButton(text='Show subjects', callback_data=data.cbSubj)],
             [InlineKeyboardButton(text='View schedule', callback_data=data.cbSch)],
-            [InlineKeyboardButton(text='Media operations', callback_data=data.cbMedia_operations)],
+            [InlineKeyboardButton(text='Media operations', callback_data=data.cbMediaOp)],
         ]
         reply = InlineKeyboardMarkup(main_menu_markup)
         bot.editMessageText(text=data.hello(query.message.chat.first_name, bot.first_name),
                             chat_id=c_i, reply_markup=reply, message_id=m_i)
         return ConversationHandler.END
 
-    elif query.data == data.cbMedia_operations:
+    elif query.data == data.cbMediaOp:
         media_operation_markup = [
-            [InlineKeyboardButton(text='Send photo', callback_data=data.cbShare_photo)],
+            [InlineKeyboardButton(text='Send photo', callback_data=data.cbSend_photo)],
             [InlineKeyboardButton(text='Send document', callback_data=data.cbSend_file)],
-            [InlineKeyboardButton(text='Send sticker', callback_data=data.cbShare_cticker)],
+            [InlineKeyboardButton(text='Send sticker', callback_data=data.cbSend_sticker)],
+            [InlineKeyboardButton(text='Send audio', callback_data=data.cbSend_audio)],
+            [InlineKeyboardButton(text='Send video', callback_data=data.cbSend_video)],
             [InlineKeyboardButton(text='Back', callback_data=data.cbMain)],
         ]
         media_reply = InlineKeyboardMarkup(media_operation_markup)
-        bot.editMessageText(text='Menu of the sending media',
+        bot.editMessageText(text='Menu for sending different media',
                             chat_id=c_i, reply_markup=media_reply, message_id=m_i)
         return ConversationHandler.END
 
@@ -356,39 +357,68 @@ def callback(bot, update, user_data):
 
 
     # ------------ Button 'SHARE PHOTO'  ------------ # START
-    elif query.data == data.cbShare_photo:
-        main_menu_markup = [
-            [InlineKeyboardButton(text='Back', callback_data=data.cbMedia_operations)],
+    elif query.data == data.cbSend_photo:
+        markup = [
+            [InlineKeyboardButton(text='Back', callback_data=data.cbMediaOp)],
         ]
-        reply = InlineKeyboardMarkup(main_menu_markup)
-        logger.info('Created a message, awaiting photo')
-        bot.editMessageText(text='Give me your another photo', chat_id=c_i, reply_markup=reply, message_id=m_i)
+        reply = InlineKeyboardMarkup(markup)
+        logger.info(f'Created a message (id {m_i}), awaiting a photo')
+        user_data['m_i'] = m_i
+        bot.editMessageText(text='Give me a photo', chat_id=c_i, reply_markup=reply, message_id=m_i)
         return 'photo'
     # ------------ Button 'SHARE PHOTO' ------------ # END
 
 
     # ------------ Button 'SEND FILE'  ------------ # START
     elif query.data == data.cbSend_file:
-        main_menu_markup = [
-            [InlineKeyboardButton(text='Back', callback_data=data.cbMedia_operations)],
+        markup = [
+            [InlineKeyboardButton(text='Back', callback_data=data.cbMediaOp)],
         ]
-        reply = InlineKeyboardMarkup(main_menu_markup)
-        logger.info('Created a message, awaiting document')
-        bot.editMessageText(text='Give me your another file', chat_id=c_i, reply_markup=reply, message_id=m_i)
+        reply = InlineKeyboardMarkup(markup)
+        logger.info(f'Created a message (id {m_i}), awaiting a document')
+        user_data['m_i'] = m_i
+        bot.editMessageText(text='Give me a file', chat_id=c_i, reply_markup=reply, message_id=m_i)
         return 'file'
     # ------------ Button 'SEND FILE' ------------ # END
 
 
-    # ------------ Button 'SHARE STICKER  ------------ # START
-    elif query.data == data.cbShare_cticker:
-        main_menu_markup = [
-            [InlineKeyboardButton(text='Back', callback_data=data.cbMedia_operations)],
+    # ------------ Button 'SHARE STICKER'  ------------ # START
+    elif query.data == data.cbSend_sticker:
+        markup = [
+            [InlineKeyboardButton(text='Back', callback_data=data.cbMediaOp)],
         ]
-        reply = InlineKeyboardMarkup(main_menu_markup)
-        logger.info('Created a message, awaiting sticker')
-        bot.editMessageText(text='Give me your another sticker', chat_id=c_i, reply_markup=reply, message_id=m_i)
+        reply = InlineKeyboardMarkup(markup)
+        logger.info(f'Created a message (id {m_i}), awaiting a sticker')
+        user_data['m_i'] = m_i
+        bot.editMessageText(text='Give me a sticker', chat_id=c_i, reply_markup=reply, message_id=m_i)
         return 'sticker'
     # ------------ Button 'SHARE STICKER' ------------ # END
+
+
+    # ------------ Button 'SHARE AUDIO'  ------------ # START
+    elif query.data == data.cbSend_audio:
+        markup = [
+            [InlineKeyboardButton(text='Back', callback_data=data.cbMediaOp)],
+        ]
+        reply = InlineKeyboardMarkup(markup)
+        logger.info(f'Created a message (id {m_i}), awaiting an audio file')
+        user_data['m_i'] = m_i
+        bot.editMessageText(text='Give me an audio file', chat_id=c_i, reply_markup=reply, message_id=m_i)
+        return 'audio'
+    # ------------ Button 'SHARE AUDIO' ------------ # END
+
+
+    # ------------ Button 'SHARE VIDEO'  ------------ # START
+    elif query.data == data.cbSend_video:
+        markup = [
+            [InlineKeyboardButton(text='Back', callback_data=data.cbMediaOp)],
+        ]
+        reply = InlineKeyboardMarkup(markup)
+        logger.info(f'Created a message (id {m_i}), awaiting a video file')
+        user_data['m_i'] = m_i
+        bot.editMessageText(text='Give me a video file', chat_id=c_i, reply_markup=reply, message_id=m_i)
+        return 'video'
+    # ------------ Button 'SHARE VIDEO' ------------ # END
 
     else:
         days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
@@ -433,11 +463,13 @@ def callback(bot, update, user_data):
 def clear_messages(bot, update):
     logger.info('Stage: Entered /clear command')
     mid = update.message.message_id
+    err = 0
     while mid >= 0:
         try:
             bot.deleteMessage(chat_id=update.message.chat_id, message_id=mid)
             logger.info(f'-in cycle: deleting message #{mid}')
         except:
             logger.info(f'-in cycle: deleting message #{mid} - error, exiting')
-            break
+            err += 1
+            if err == 10: return
         mid -= 1
