@@ -6,6 +6,8 @@ import data
 from media.photo import user_photo
 from media.file import user_file
 from media.sticker import user_scticker
+from media.audio import user_audio
+from media.video import user_video
 logger = data.logger
 
 
@@ -13,7 +15,7 @@ def start_bot(bot, update):
     markup = [
         [InlineKeyboardButton(text='Show subjects', callback_data=data.cbSubj)],
         [InlineKeyboardButton(text='View schedule', callback_data=data.cbSch)],
-        [InlineKeyboardButton(text='Media operations', callback_data=data.cbMedia_operations)]
+        [InlineKeyboardButton(text='Media operations', callback_data=data.cbMediaOp)]
 
     ]
 
@@ -38,11 +40,15 @@ def main():
                                                                                        edit_subject,
                                                                                        pass_user_data=True)],
                                                        'photo': [MessageHandler(Filters.photo,
-                                                                                user_photo)],
+                                                                                user_photo, pass_user_data=True)],
                                                        'file': [MessageHandler(Filters.document,
-                                                                               user_file)],
+                                                                               user_file, pass_user_data=True)],
                                                        'sticker': [MessageHandler(Filters.sticker,
-                                                                                  user_scticker)]
+                                                                                  user_scticker, pass_user_data=True)],
+                                                       'audio': [MessageHandler(Filters.audio,
+                                                                                  user_audio, pass_user_data=True)],
+                                                       'video': [MessageHandler(Filters.video,
+                                                                                  user_video, pass_user_data=True)]
                                                    },
                                                    fallbacks=[CallbackQueryHandler(callback, pass_user_data=True)]))
     upd.start_polling()
