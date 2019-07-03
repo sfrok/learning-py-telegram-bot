@@ -2,13 +2,8 @@ from telegram.ext import Updater, CommandHandler, CallbackQueryHandler, Conversa
     MessageHandler, Filters
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 from handlers import regex_handler, add_subject, edit_subject, callback, clear_messages
+from media import user_photo, user_file, user_sticker, user_audio, user_video, user_animation
 import data
-from media.photo import user_photo
-from media.file import user_file
-from media.sticker import user_scticker
-from media.audio import user_audio
-from media.video import user_video
-from media.gif import user_animation
 logger = data.logger
 
 
@@ -43,7 +38,7 @@ def main():
                                                        'file': [MessageHandler(Filters.document,
                                                                                user_file, pass_user_data=True)],
                                                        'sticker': [MessageHandler(Filters.sticker,
-                                                                                  user_scticker, pass_user_data=True)],
+                                                                                  user_sticker, pass_user_data=True)],
                                                        'audio': [MessageHandler(Filters.audio,
                                                                                   user_audio, pass_user_data=True)],
                                                        'video': [MessageHandler(Filters.video,
