@@ -1,10 +1,11 @@
 from telegram.ext import ConversationHandler
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 import data
+
 logger = data.logger
 
+
 def user_scticker(bot, update, user_data):
-    print(update)
     sticker_id = update.message.sticker.file_id
     logger.info(f'Stage: Received a sticker. ID: {sticker_id}')
     sticker = bot.get_file(sticker_id)
