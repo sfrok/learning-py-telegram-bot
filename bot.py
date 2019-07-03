@@ -8,6 +8,7 @@ from media.file import user_file
 from media.sticker import user_scticker
 from media.audio import user_audio
 from media.video import user_video
+from media.gif import user_animation
 logger = data.logger
 
 
@@ -16,9 +17,7 @@ def start_bot(bot, update):
         [InlineKeyboardButton(text='Show subjects', callback_data=data.cbSubj)],
         [InlineKeyboardButton(text='View schedule', callback_data=data.cbSch)],
         [InlineKeyboardButton(text='Media operations', callback_data=data.cbMediaOp)]
-
     ]
-
     reply = InlineKeyboardMarkup(markup)
     update.message.reply_text(data.hello(update.message.chat.first_name, bot.first_name), reply_markup=reply)
 
@@ -48,7 +47,9 @@ def main():
                                                        'audio': [MessageHandler(Filters.audio,
                                                                                   user_audio, pass_user_data=True)],
                                                        'video': [MessageHandler(Filters.video,
-                                                                                  user_video, pass_user_data=True)]
+                                                                                  user_video, pass_user_data=True)],
+                                                       'animation': [MessageHandler(Filters.animation,
+                                                                                  user_animation, pass_user_data=True)]
                                                    },
                                                    fallbacks=[CallbackQueryHandler(callback, pass_user_data=True)]))
     upd.start_polling()
