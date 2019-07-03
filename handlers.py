@@ -2,6 +2,7 @@ from telegram.ext import Updater, CommandHandler, CallbackQueryHandler, Conversa
     MessageHandler, Filters
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 import data
+
 logger = data.logger
 
 
@@ -200,7 +201,6 @@ def callback(bot, update, user_data):
         callback(bot, update, user_data)
     # ------------ Button 'DELETE' in schedule ------------ # END
 
-
     # ------------ Button 'ADD' in schedule ------------ # START
     elif query.data == data.cbSch_add1:
         logger.info('= = = = = ADDING: STARTED = = = = =')
@@ -228,7 +228,6 @@ def callback(bot, update, user_data):
         update.callback_query.data = user_data['day']
         callback(bot, update, user_data)
     # ------------ Button 'ADD' in schedule ------------ # END
-
 
     # ------------ Button 'EDIT' in schedule ------------ # START
     elif query.data == data.cbSch_edi1:
@@ -271,7 +270,6 @@ def callback(bot, update, user_data):
         callback(bot, update, user_data)
     # ------------ Button 'EDIT' in schedule ------------ # END
 
-
     # ------------ Button 'DELETE' in subjects ------------ # START
     elif query.data == data.cbSubj_del1:
         logger.info('= = = = = DELETING: Deleting a subject... = = = = =')
@@ -297,7 +295,8 @@ def callback(bot, update, user_data):
         for i in sched:
             logger.info(f'-in cycle. user_data[data][sched][i]: {user_data["data"]["sched"][i]}')
             for j in range(0, len(sched[i])):
-                logger.info(f'-in cycle. item_id: {item_id}, sched[i][j]: {sched[i][j]}, len(subjects) + 1: {len(subjects) + 1}')
+                logger.info(f'-in cycle. item_id: {item_id}, sched[i][j]: {sched[i][j]}, '
+                            f'len(subjects) + 1: {len(subjects) + 1}')
                 if sched[i][j] == item_id:
                     sched[i][j] = -1
                 elif len(subjects) + 1 > sched[i][j] > item_id:
@@ -320,7 +319,6 @@ def callback(bot, update, user_data):
         callback(bot, update, user_data)
     # ------------ Button 'DELETE' in subjects ------------ # END
 
-
     # ------------ Button 'ADD' in subjects ------------ # START
     elif query.data == data.cbSubj_add1:
         logger.info('= = = = = ADDING: Adding a subject... = = = = =')
@@ -331,7 +329,6 @@ def callback(bot, update, user_data):
         user_data['update'] = update
         return 'add_subject'
     # ------------ Button 'ADD' in subjects ------------ # END
-
 
     # ------------ Button 'EDIT' in subjects ------------ # START
     elif query.data == data.cbSubj_edi1:
@@ -356,7 +353,6 @@ def callback(bot, update, user_data):
         return 'edit_subject'
     # ------------ Button 'EDIT' in subjects ------------ # END
 
-
     # ------------ Button 'SHARE PHOTO'  ------------ # START
     elif query.data == data.cbSend_photo:
         markup = [
@@ -368,7 +364,6 @@ def callback(bot, update, user_data):
         bot.editMessageText(text='Give me a photo', chat_id=c_i, reply_markup=reply, message_id=m_i)
         return 'photo'
     # ------------ Button 'SHARE PHOTO' ------------ # END
-
 
     # ------------ Button 'SEND FILE'  ------------ # START
     elif query.data == data.cbSend_file:
@@ -382,7 +377,6 @@ def callback(bot, update, user_data):
         return 'file'
     # ------------ Button 'SEND FILE' ------------ # END
 
-
     # ------------ Button 'SHARE STICKER'  ------------ # START
     elif query.data == data.cbSend_sticker:
         markup = [
@@ -394,7 +388,6 @@ def callback(bot, update, user_data):
         bot.editMessageText(text='Give me a sticker', chat_id=c_i, reply_markup=reply, message_id=m_i)
         return 'sticker'
     # ------------ Button 'SHARE STICKER' ------------ # END
-
 
     # ------------ Button 'SHARE AUDIO'  ------------ # START
     elif query.data == data.cbSend_audio:
@@ -408,7 +401,6 @@ def callback(bot, update, user_data):
         return 'audio'
     # ------------ Button 'SHARE AUDIO' ------------ # END
 
-
     # ------------ Button 'SHARE VIDEO'  ------------ # START
     elif query.data == data.cbSend_video:
         markup = [
@@ -420,7 +412,6 @@ def callback(bot, update, user_data):
         bot.editMessageText(text='Give me a video file', chat_id=c_i, reply_markup=reply, message_id=m_i)
         return 'video'
     # ------------ Button 'SHARE VIDEO' ------------ # END
-
 
     # ------------ Button 'SHARE GIF'  ------------ # START
     elif query.data == data.cbSend_gif:
@@ -480,10 +471,10 @@ def clear_messages(bot, update):
     err = 0
     while mid >= 0:
         try:
-            bot.deleteMessage(chat_id=update.message.chat_id, message_id=mid)
+            bot.deleteMessage(chat_id=update.message.chat_id, message_id=mid, timeout=0.01)
             logger.info(f'-in cycle: deleting message #{mid}')
         except:
-            logger.info(f'-in cycle: deleting message #{mid} - error, exiting')
+            logger.info(f'-in cycle: deleting message #{mid} - error, {err+1}')
             err += 1
-            if err == 10: return
+            if err == 100: return
         mid -= 1
