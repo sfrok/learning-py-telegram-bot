@@ -1,5 +1,4 @@
-from telegram.ext import Updater, CommandHandler, CallbackQueryHandler, ConversationHandler, RegexHandler, \
-    MessageHandler, Filters
+from telegram.ext import ConversationHandler
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 import data
 
@@ -474,7 +473,7 @@ def clear_messages(bot, update):
             bot.deleteMessage(chat_id=update.message.chat_id, message_id=mid, timeout=0.01)
             logger.info(f'-in cycle: deleting message #{mid}')
         except:
-            logger.info(f'-in cycle: deleting message #{mid} - error, {err+1}')
+            logger.info(f'-in cycle: deleting message #{mid} - error, {err + 1}')
             err += 1
             if err == 100: return
         mid -= 1
