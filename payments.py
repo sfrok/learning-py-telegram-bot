@@ -1,5 +1,4 @@
-from telegram import LabeledPrice, Invoice, ShippingAddress, OrderInfo, ShippingOption, SuccessfulPayment, \
-    ShippingQuery, PreCheckoutQuery
+from telegram import LabeledPrice
 import settings
 
 
