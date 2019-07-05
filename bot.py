@@ -23,7 +23,7 @@ def main():
     upd.dispatcher.add_handler(CommandHandler('start', start_bot))
     upd.dispatcher.add_handler(CommandHandler('clear', clear_messages))
     upd.dispatcher.add_handler(PreCheckoutQueryHandler(payments.precheckout_callback))
-    upd.dispatcher.add_handler(MessageHandler(Filters.successful_payment, payments.successful_payment_message))
+    # upd.dispatcher.add_handler(MessageHandler(Filters.successful_payment, payments.successful_payment_message))
     upd.dispatcher.add_handler(CommandHandler('noshipping', payments.payment_noshipping))
     upd.dispatcher.add_handler(ConversationHandler(entry_points=[CallbackQueryHandler(callback, pass_user_data=True)],
                                                    states={
