@@ -22,7 +22,7 @@ def regex_handler(bot, update, groups, user_data):
 
 
 def edit_subject(bot, update, user_data):
-    logger.info(f'Stage: Recieved text "{update.message.text}"')
+    logger.info(f'Stage: Received text "{update.message.text}"')
     subjects = user_data['data']['items']
     new_subject_name = update.message.text
     markup = [
@@ -67,7 +67,7 @@ def edit_subject(bot, update, user_data):
 
 
 def add_subject(bot, update, user_data):
-    logger.info(f'Stage: Recieved text "{update.message.text}"')
+    logger.info(f'Stage: Received text "{update.message.text}"')
     subjects = user_data['data']['items']
     subject_name = update.message.text
     markup = [
