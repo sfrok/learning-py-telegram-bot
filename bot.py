@@ -1,5 +1,5 @@
 from telegram.ext import Updater, CommandHandler, CallbackQueryHandler, ConversationHandler, RegexHandler, \
-    MessageHandler, Filters, PreCheckoutQueryHandler
+    MessageHandler, Filters, PreCheckoutQueryHandler, ShippingQueryHandler
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 from handlers import regex_handler, add_subject, edit_subject, callback, clear_messages
 from media import user_photo, user_file, user_sticker, user_audio, user_video, user_animation
@@ -22,9 +22,11 @@ def main():
     upd = Updater(data.settings.API_TOKEN)
     upd.dispatcher.add_handler(CommandHandler('start', start_bot))
     upd.dispatcher.add_handler(CommandHandler('clear', clear_messages))
-    upd.dispatcher.add_handler(PreCheckoutQueryHandler(payments.precheckout_callback))
-    # upd.dispatcher.add_handler(MessageHandler(Filters.successful_payment, payments.successful_payment_message))
     upd.dispatcher.add_handler(CommandHandler('noshipping', payments.payment_noshipping))
+    upd.dispatcher.add_handler(CommandHandler('shipping', payments.payment_shipping))
+    upd.dispatcher.add_handler(ShippingQueryHandler(payments.shipping_callback))
+    upd.dispatcher.add_handler(PreCheckoutQueryHandler(payments.precheckout_callback))
+    upd.dispatcher.add_handler(MessageHandler(Filters.successful_payment, payments.successful_payment_message))
     upd.dispatcher.add_handler(ConversationHandler(entry_points=[CallbackQueryHandler(callback, pass_user_data=True)],
                                                    states={
                                                        'sched_add_regex': [RegexHandler('^([1-9]|10)$',
