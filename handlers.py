@@ -120,8 +120,8 @@ def callback(bot, update, user_data):
         markup = [[InlineKeyboardButton(text='Add', callback_data=data.cbSubj_add1)]] + markup
         if user_data['data']['items'] != []:
             tmp = '\n'.join(sorted(user_data['data']['items']))
+            markup.insert(1, [InlineKeyboardButton(text='Delete', callback_data=data.cbSubj_del1)])
             markup.insert(1, [InlineKeyboardButton(text='Edit', callback_data=data.cbSubj_edi1)])
-            markup.insert(2, [InlineKeyboardButton(text='Delete', callback_data=data.cbSubj_del1)])
             reply = InlineKeyboardMarkup(markup)
             bot.editMessageText(text=f"Here's the list of available subjects:\n{tmp}",
                                 chat_id=c_i, reply_markup=reply, message_id=m_i)
