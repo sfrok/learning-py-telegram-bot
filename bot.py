@@ -1,7 +1,7 @@
 from telegram.ext import Updater, CommandHandler, CallbackQueryHandler, ConversationHandler, RegexHandler, \
     MessageHandler, Filters, PreCheckoutQueryHandler, ShippingQueryHandler
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
-from handlers import regex_handler, add_subject, edit_subject, callback, clear_messages
+from handlers import regex_handler, add_subject, edit_subject, callback, clear_messages, oop_search
 from media import user_photo, user_file, user_sticker, user_audio, user_video, user_animation
 import data
 import payments
@@ -12,7 +12,8 @@ def start_bot(bot, update):
     markup = [
         [InlineKeyboardButton(text='Show subjects', callback_data=data.cbSubj)],
         [InlineKeyboardButton(text='View schedule', callback_data=data.cbSch)],
-        [InlineKeyboardButton(text='Media operations', callback_data=data.cbMediaOp)]
+        [InlineKeyboardButton(text='Media operations', callback_data=data.cbMediaOp)],
+        [InlineKeyboardButton(text='Documents', callback_data=data.cbDocMenu)]
     ]
     reply = InlineKeyboardMarkup(markup)
     update.message.reply_text(data.hello(update.message.chat.first_name, bot.first_name), reply_markup=reply)
@@ -50,7 +51,9 @@ def main():
                                                        'video': [MessageHandler(Filters.video,
                                                                                   user_video, pass_user_data=True)],
                                                        'animation': [MessageHandler(Filters.animation,
-                                                                                  user_animation, pass_user_data=True)]
+                                                                                  user_animation, pass_user_data=True)],
+                                                       'oop_search': [MessageHandler(Filters.text,
+                                                                                    oop_search, pass_user_data=True)]
                                                    },
                                                    fallbacks=[CallbackQueryHandler(callback, pass_user_data=True)]))
     upd.start_polling()

@@ -1,6 +1,7 @@
 from telegram.ext import ConversationHandler
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 import data
+import oop
 
 logger = data.logger
 
@@ -106,6 +107,22 @@ def add_subject(bot, update, user_data):
     return ConversationHandler.END
 
 
+def oop_search(bot, update, user_data):
+    logger.info(f'Stage: Received text "{update.message.text}"')
+    bot.deleteMessage(chat_id=update.message.chat_id, message_id=update.message.message_id)
+    markup = [[InlineKeyboardButton(text='Back', callback_data=data.cbDocMenu)]]
+    tmp = oop.doc_search(user_data['docs'], update.message.text)
+    if tmp!='':
+        reply = InlineKeyboardMarkup(markup)
+        bot.editMessageText(text=f"Here're results for '{update.message.text}':{tmp}",
+                            chat_id=update.message.chat_id, reply_markup=reply, message_id=user_data['m_i'])
+    else:
+        reply = InlineKeyboardMarkup(markup)
+        bot.editMessageText(text=f"No results for '{update.message.text}'!",
+                            chat_id=update.message.chat_id, reply_markup=reply, message_id=user_data['m_i'])
+    return ConversationHandler.END
+
+
 def callback(bot, update, user_data):
     markup = [[InlineKeyboardButton(text='Back', callback_data=data.cbMain)]]
     reply = InlineKeyboardMarkup(markup)
@@ -132,12 +149,13 @@ def callback(bot, update, user_data):
             logger.info('Warning - empty subject list!')
 
     elif query.data == data.cbMain:
-        main_menu_markup = [
+        markup = [
             [InlineKeyboardButton(text='Show subjects', callback_data=data.cbSubj)],
             [InlineKeyboardButton(text='View schedule', callback_data=data.cbSch)],
             [InlineKeyboardButton(text='Media operations', callback_data=data.cbMediaOp)],
+            [InlineKeyboardButton(text='Documents', callback_data=data.cbDocMenu)]
         ]
-        reply = InlineKeyboardMarkup(main_menu_markup)
+        reply = InlineKeyboardMarkup(markup)
         bot.editMessageText(text=data.hello(query.message.chat.first_name, bot.first_name),
                             chat_id=c_i, reply_markup=reply, message_id=m_i)
         return ConversationHandler.END
@@ -423,6 +441,46 @@ def callback(bot, update, user_data):
         bot.editMessageText(text='Give me a .gif file', chat_id=c_i, reply_markup=reply, message_id=m_i)
         return 'animation'
     # ------------ Button 'SHARE GIF' ------------ # END
+
+    elif query.data == data.cbDocMenu:
+        markup = [
+            [InlineKeyboardButton(text='Generate documents', callback_data=data.cbDocGen)],
+            [InlineKeyboardButton(text='Search', callback_data=data.cbDocSearch)],
+            [InlineKeyboardButton(text='Show documents', callback_data=data.cbDocShow)],
+            [InlineKeyboardButton(text='Back', callback_data=data.cbMain)]
+        ]
+        reply = InlineKeyboardMarkup(markup)
+        bot.editMessageText(text=data.hello(query.message.chat.first_name, bot.first_name),
+                            chat_id=c_i, reply_markup=reply, message_id=m_i)
+        return ConversationHandler.END
+
+    elif query.data == data.cbDocGen:
+        user_data['docs'] = oop.doc_gen()
+        update.callback_query.data = data.cbDocShow
+        callback(bot, update, user_data)
+
+
+    if query.data == data.cbDocShow:
+        markup = [[InlineKeyboardButton(text='Back', callback_data=data.cbDocMenu)]]
+        if user_data.get('docs', None)!=None:
+            tmp = ''
+            for i in user_data['docs']: tmp += '\n' + i.display_info()
+            reply = InlineKeyboardMarkup(markup)
+            bot.editMessageText(text=f"Here's the list of documents:{tmp}",
+                                chat_id=c_i, reply_markup=reply, message_id=m_i)
+        else:
+            reply = InlineKeyboardMarkup(markup)
+            bot.editMessageText(text="No documents yet!",
+                                chat_id=c_i, reply_markup=reply, message_id=m_i)
+
+
+    if query.data == data.cbDocSearch:
+        reply = InlineKeyboardMarkup([[InlineKeyboardButton(text='Back', callback_data=data.cbDocMenu)]])
+        bot.editMessageText(text=f"Enter your search string:",
+                            chat_id=c_i, reply_markup=reply, message_id=m_i)
+        user_data['update'] = update
+        user_data['m_i'] = m_i
+        return 'oop_search'
 
     else:
         days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']

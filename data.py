@@ -28,6 +28,13 @@ cbSubj_add1 = 'add_subject'
 cbSubj_edi1 = 'edit_subject_start'
 cbSubj_edi2 = 'edit_subject_item'
 
+# Indexing callback data OOP
+cbDocMenu = 'Menu for OOP testing'
+cbDocGen = 'Generating a document list'
+cbDocSearch = 'Document search'
+cbDocSearchResult = 'Document search result'
+cbDocShow = 'Document print'
+
 
 def hello(user,
           bot): return f'Hello {user}!\nMy name is {bot} and I will help you getting track of your study schedule.'
