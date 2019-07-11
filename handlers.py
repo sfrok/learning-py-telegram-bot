@@ -107,6 +107,17 @@ def add_subject(bot, update, user_data):
     return ConversationHandler.END
 
 
+def user_location(bot, update, user_data):
+    user_location = update.message.location
+    user_first_name = update.message.from_user.first_name
+    logger.info(f'Location of {user_first_name}, longitude: {user_location.longitude}, '
+                f'latitude: {user_location.latitude}')
+    bot.deleteMessage(chat_id=update.message.chat_id, message_id=user_data.pop('m_i'))
+    reply = InlineKeyboardMarkup([[InlineKeyboardButton(text='Back', callback_data=data.cbSlocation)]])
+    bot.sendMessage(text=f'Success!', reply_markup=reply, chat_id=update.message.chat_id)
+    return ConversationHandler.END
+
+
 def oop_search(bot, update, user_data):
     logger.info(f'Stage: Received text "{update.message.text}"')
     bot.deleteMessage(chat_id=update.message.chat_id, message_id=update.message.message_id)
@@ -153,7 +164,8 @@ def callback(bot, update, user_data):
             [InlineKeyboardButton(text='Show subjects', callback_data=data.cbSubj)],
             [InlineKeyboardButton(text='View schedule', callback_data=data.cbSch)],
             [InlineKeyboardButton(text='Media operations', callback_data=data.cbMediaOp)],
-            [InlineKeyboardButton(text='Documents', callback_data=data.cbDocMenu)]
+            [InlineKeyboardButton(text='Documents', callback_data=data.cbDocMenu)],
+            [InlineKeyboardButton(text='Location', callback_data=data.cbSlocation)]
         ]
         reply = InlineKeyboardMarkup(markup)
         bot.editMessageText(text=data.hello(query.message.chat.first_name, bot.first_name),
@@ -441,6 +453,17 @@ def callback(bot, update, user_data):
         bot.editMessageText(text='Give me a .gif file', chat_id=c_i, reply_markup=reply, message_id=m_i)
         return 'animation'
     # ------------ Button 'SHARE GIF' ------------ # END
+
+    # ------------ Button 'Send Location'  ------------ # START
+    elif query.data == data.cbSlocation:
+        markup = [
+            [InlineKeyboardButton(text='Back', callback_data=data.cbMain)],
+        ]
+        user_data['m_i'] = m_i
+        reply = InlineKeyboardMarkup(markup)
+        bot.editMessageText(text='Send me your location (phone only)', chat_id=c_i, reply_markup=reply, message_id=m_i)
+        return 'location'
+    # ------------ Button 'Send Location' ------------ # END
 
     elif query.data == data.cbDocMenu:
         markup = [
