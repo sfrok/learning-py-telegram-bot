@@ -4,10 +4,10 @@ import data
 logger = data.logger
 
 # Indexing payment data, NO shipping
-NoShID = 'No Shipping Item #1' #start_parameter
+NoShID = 'test-payment'  # start_parameter
 NoShLp = 'NoShLabeledPrice0'
 # Indexing payment data, shipping
-ShID = 'Shipping Item #1' #start_parameter
+ShID = 'test-payment'  # start_parameter
 ShLp = 'ShLabeledPrice0'
 ShOption = []
 ShOption.append('ShOption0Shipping')
@@ -17,7 +17,7 @@ ShLpShipping.append('ShLabeledPrice0Shipping')
 ShLpShipping.append('ShLabeledPrice1Shipping')
 ShLpShipping.append('ShLabeledPrice2Shipping')
 # Indexing payment data, other
-ShPL = 'payload1' #payload
+ShPL = 'payload1'  # payload
 UAH = 'UAH'
 
 
