@@ -123,7 +123,7 @@ def oop_search(bot, update, user_data):
     bot.deleteMessage(chat_id=update.message.chat_id, message_id=update.message.message_id)
     markup = [[InlineKeyboardButton(text='Back', callback_data=data.cbDocMenu)]]
     tmp = oop.doc_search(user_data['docs'], update.message.text)
-    if tmp!='':
+    if tmp != '':
         reply = InlineKeyboardMarkup(markup)
         bot.editMessageText(text=f"Here're results for '{update.message.text}':{tmp}",
                             chat_id=update.message.chat_id, reply_markup=reply, message_id=user_data['m_i'])
@@ -146,7 +146,7 @@ def callback(bot, update, user_data):
     if query.data == data.cbSubj:
         user_data['data'] = data.get_data(query.message.chat_id)  # Requesting schedule data
         markup = [[InlineKeyboardButton(text='Add', callback_data=data.cbSubj_add1)]] + markup
-        if user_data['data']['items'] != []:
+        if user_data['data']['items']:
             tmp = '\n'.join(sorted(user_data['data']['items']))
             markup.insert(1, [InlineKeyboardButton(text='Delete', callback_data=data.cbSubj_del1)])
             markup.insert(1, [InlineKeyboardButton(text='Edit', callback_data=data.cbSubj_edi1)])
@@ -482,22 +482,19 @@ def callback(bot, update, user_data):
         update.callback_query.data = data.cbDocShow
         callback(bot, update, user_data)
 
-
-    if query.data == data.cbDocShow:
+    elif query.data == data.cbDocShow:
         markup = [[InlineKeyboardButton(text='Back', callback_data=data.cbDocMenu)]]
-        if user_data.get('docs', None)!=None:
+        reply = InlineKeyboardMarkup(markup)
+        if user_data.get('docs', None) is not None:
             tmp = ''
             for i in user_data['docs']: tmp += '\n' + i.display_info()
-            reply = InlineKeyboardMarkup(markup)
             bot.editMessageText(text=f"Here's the list of documents:{tmp}",
                                 chat_id=c_i, reply_markup=reply, message_id=m_i)
         else:
-            reply = InlineKeyboardMarkup(markup)
             bot.editMessageText(text="No documents yet!",
                                 chat_id=c_i, reply_markup=reply, message_id=m_i)
 
-
-    if query.data == data.cbDocSearch:
+    elif query.data == data.cbDocSearch:
         reply = InlineKeyboardMarkup([[InlineKeyboardButton(text='Back', callback_data=data.cbDocMenu)]])
         bot.editMessageText(text=f"Enter your search string:",
                             chat_id=c_i, reply_markup=reply, message_id=m_i)
