@@ -2,6 +2,8 @@ from telegram.ext import ConversationHandler
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 import data
 import oop
+import buttonURLs as bu
+
 
 logger = data.logger
 
@@ -165,7 +167,8 @@ def callback(bot, update, user_data):
             [InlineKeyboardButton(text='View schedule', callback_data=data.cbSch)],
             [InlineKeyboardButton(text='Media operations', callback_data=data.cbMediaOp)],
             [InlineKeyboardButton(text='Documents', callback_data=data.cbDocMenu)],
-            [InlineKeyboardButton(text='Location', callback_data=data.cbSlocation)]
+            [InlineKeyboardButton(text='Location', callback_data=data.cbSlocation)],
+            [InlineKeyboardButton(text='Linked list of buttons', callback_data=data.cbLinkedButton)]
         ]
         reply = InlineKeyboardMarkup(markup)
         bot.editMessageText(text=data.hello(query.message.chat.first_name, bot.first_name),
@@ -465,6 +468,11 @@ def callback(bot, update, user_data):
         return 'location'
     # ------------ Button 'Send Location' ------------ # END
 
+    # ------------ Button 'General button' ------------ # START
+    elif query.data == data.cbLinkedButton:
+        bu.follow_site(bot, update)
+    # ------------ Button 'General button' ------------ # END
+
     elif query.data == data.cbDocMenu:
         markup = [
             [InlineKeyboardButton(text='Generate documents', callback_data=data.cbDocGen)],
@@ -487,7 +495,8 @@ def callback(bot, update, user_data):
         reply = InlineKeyboardMarkup(markup)
         if user_data.get('docs', None) is not None:
             tmp = ''
-            for i in user_data['docs']: tmp += '\n' + i.display_info()
+            for i in user_data['docs']:
+                tmp += '\n' + i.display_info()
             bot.editMessageText(text=f"Here's the list of documents:{tmp}",
                                 chat_id=c_i, reply_markup=reply, message_id=m_i)
         else:
@@ -553,5 +562,6 @@ def clear_messages(bot, update):
         except:
             logger.info(f'-in cycle: deleting message #{mid} - error, {err + 1}')
             err += 1
-            if err == 100: return
+            if err == 100:
+                return
         mid -= 1
