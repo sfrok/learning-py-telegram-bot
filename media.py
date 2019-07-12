@@ -9,14 +9,14 @@ def user_audio(bot, update, user_data):
     audio_id = update.message.audio.file_id
     logger.info(f'Stage: Received an audio file. ID: {audio_id}')
     audio = bot.get_file(audio_id)
-    audio.download(f"static/{audio_id}.mp3")
-    bot.send_audio(chat_id=update.message.chat.id, audio=open(f"static/{audio_id}.mp3", "rb"))
     my_file = f"static/{audio_id}.mp3"
+    audio.download(my_file)
+    bot.send_audio(chat_id=update.message.chat.id, audio=open(my_file, "rb"))
     if os.path.isfile(my_file):
         os.remove(my_file)
         logger.info('Removing in static finished')
     else:
-        logger.info(f'Error {my_file} file is not found')
+        logger.info(f'Error: {my_file} file is not found')
     bot.deleteMessage(chat_id=update.message.chat_id, message_id=user_data.pop('m_i'))
     reply = InlineKeyboardMarkup([[InlineKeyboardButton(text='Back', callback_data=data.cbMediaOp)]])
     bot.sendMessage(text=f'Success!', reply_markup=reply, chat_id=update.message.chat_id)
