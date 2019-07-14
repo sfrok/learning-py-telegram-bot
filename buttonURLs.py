@@ -7,6 +7,7 @@ def linked_button(function):
         message_text = 'Enter the any button:'
         markup = [
             [InlineKeyboardButton(text='Go to google.com', url='https://www.google.com/', callback_data=data.cbSite)],
+            [InlineKeyboardButton(text='Go to our telegram channel', url='https://t.me/ithumor', callback_data=data.cbChannel)],
             [InlineKeyboardButton(text='Back', callback_data=data.cbMain)]
         ]
         reply = InlineKeyboardMarkup(markup)
