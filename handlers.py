@@ -470,7 +470,7 @@ def callback(bot, update, user_data):
 
     # ------------ Button 'General button' ------------ # START
     elif query.data == data.cbLinkedButton:
-        bu.follow_site(bot, update)
+        bu.url_reply(bot, update)
     # ------------ Button 'General button' ------------ # END
 
     elif query.data == data.cbDocMenu:
