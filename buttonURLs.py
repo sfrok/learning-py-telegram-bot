@@ -18,7 +18,7 @@ def linked_button(function):
 
 
 @linked_button
-def follow_site(bot, update, reply, message_text):
+def url_reply(bot, update, reply, message_text):
     bot.editMessageText(text=message_text,
                         chat_id=update.callback_query.message.chat_id,
                         reply_markup=reply,
