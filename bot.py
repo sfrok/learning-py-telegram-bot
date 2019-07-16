@@ -16,6 +16,7 @@ def start_bot(bot, update):
         [InlineKeyboardButton(text='Media operations', callback_data=data.cbMediaOp)],
         [InlineKeyboardButton(text='Documents', callback_data=data.cbDocMenu)],
         [InlineKeyboardButton(text='Location', callback_data=data.cbSlocation)],
+        [InlineKeyboardButton(text='Information about chat', callback_data=data.cbInformation)],
         [InlineKeyboardButton(text='Linked list of buttons', callback_data=data.cbLinkedButton)]
     ]
     reply = InlineKeyboardMarkup(markup)
