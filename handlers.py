@@ -468,6 +468,16 @@ def callback(bot, update, user_data):
         return 'location'
     # ------------ Button 'Send Location' ------------ # END
 
+    # ------------ Button 'Information about chat'  ------------ # START
+    elif query.data == data.cbInformation:
+        markup = [
+            [InlineKeyboardButton(text='Back', callback_data=data.cbMain)],
+        ]
+        user_data['m_i'] = m_i
+        reply = InlineKeyboardMarkup(markup)
+        bot.editMessageText(text=f'Chat id is - {query.message.chat_id} \nBot name is - {bot.first_name}', chat_id=c_i, reply_markup=reply, message_id=m_i)
+    # ------------ Button 'Information about chat' ------------ # END
+
     # ------------ Button 'General button' ------------ # START
     elif query.data == data.cbLinkedButton:
         bu.follow_site(bot, update)
