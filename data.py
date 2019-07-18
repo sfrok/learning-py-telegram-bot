@@ -2,11 +2,20 @@ from logs import logger
 import settings
 import json
 
-
 # Indexing callback data
 cbMain = 'Back to main menu'
 cbSubj = 'Showing subject list'
 cbSch = 'Showing week days'
+cbMediaOp = 'Media operations'
+cbSend_photo = 'Sharing photo'
+cbSend_file = 'Sending file'
+cbSlocation = 'Location'
+cbInformation = 'Information'
+cbLinkedButton = 'Linked list of buttons'
+cbSend_sticker = 'Sharing sticker'
+cbSend_audio = 'Sharing audio'
+cbSend_video = 'Sharing video'
+cbSend_gif = 'Sharing animation'
 cbSch_del1 = 'sched_del_start'
 cbSch_del2 = 'sched_del_item_'
 cbSch_del3 = 'sched_del_all'
@@ -21,7 +30,17 @@ cbSubj_del3 = 'subj_del_all'
 cbSubj_add1 = 'add_subject'
 cbSubj_edi1 = 'edit_subject_start'
 cbSubj_edi2 = 'edit_subject_item'
-def hello(user, bot): return f'Hello {user}!\nMy name is {bot} and I will help you getting track of your study schedule.'
+
+# Indexing callback data OOP
+cbDocMenu = 'Menu for OOP testing'
+cbDocGen = 'Generating a document list'
+cbDocSearch = 'Document search'
+cbDocSearchResult = 'Document search result'
+cbDocShow = 'Document print'
+
+
+def hello(user,
+          bot): return f'Hello {user}!\nMy name is {bot} and I will help you getting track of your study schedule.'
 
 
 # Reading JSON data
