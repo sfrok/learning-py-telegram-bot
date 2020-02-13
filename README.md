@@ -32,4 +32,4 @@ Additional software and services used during the development:
 
  [<img src="https://avatars0.githubusercontent.com/u/40871531?s=400&v=4" width="16" height="16" />](https://github.com/ShumerPlema) [@ShumerPlema](https://github.com/ShumerPlema)
  
-[<img src="https://avatars0.githubusercontent.com/u/49559296?s=460&v=4" width="16" height="16" />](https://github.com/Ceterai) [@Ceterai](https://github.com/Ceterai)
+[<img src="https://avatars0.githubusercontent.com/u/49559296?s=460&v=4" width="16" height="16" />](https://github.com/GotoIndex) [@GotoIndex](https://github.com/GotoIndex)
